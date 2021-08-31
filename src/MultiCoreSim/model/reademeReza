@@ -1,0 +1,21 @@
+MCoreSimProject gets all the parameters from the MCoreSimProjectXml.h and MCoreSimProjectXml.h gets all the information from the 
+input xml config file similar to test_cfg2.xml 
+
+CpuCoreGen send request to the txFIFO of each core. also it can retrive the data aqck from the rxFIFO of each core
+All of these are handled through the ProcessTxRXBuff()
+
+PrivCacheCtrl has two interfaces with the top-level
+module (i.e. MCoreSimProject in this case). 1) m cpuFIFO to communicate with
+the CpuCoreGen module. 2) m busIfFIFO to communicate with the interconnect
+BusArbiter. Besides, it has access to the L1 cache memory device which is imple-
+mented using GenericCache class. 
+
+
+cpuFIFO  is a structure defined in MemTemplate and it has two queues, one is m_txFIFO and another one is m_rxFIFO
+
+why in Figure 4.3 cpu requests are going from RxPath to the Provate CacheCtrl and the ack are going
+from the cntrl to the TX? shouldn't this be the other way around?
+
+what is the role of m_cpuPendingFIFO in the private cache controller?
+
+is the agent the destination? I assume yes
