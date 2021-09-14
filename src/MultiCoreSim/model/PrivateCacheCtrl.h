@@ -103,6 +103,8 @@ namespace ns3 {
      // send pending WB to TxResp FIFO
      bool SendPendingWB  (GenericCacheMapFrmt recvTrans, TransType type);
 
+     void associateDeadline (ns3::BusIfFIFO::BusReqMsg msg);
+
      bool PendingCoreBufRemoveMsg  (uint64_t msgId, PendingMsg &removedMsg);
      
      bool MOESI_Modify_NoGetMResp_TxFIFO (uint64_t addr);
@@ -129,6 +131,10 @@ namespace ns3 {
     uint32_t GetCacheSize ();
 
     void SetCacheBlkSize (uint32_t cacheBlkSize);
+
+    
+
+    void assignDeadlineAfterDetermination(ns3::BusIfFIFO::BusReqMsg & msg);
 
     uint32_t GetCacheBlkSize ();
 

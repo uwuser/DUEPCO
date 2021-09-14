@@ -18,7 +18,7 @@ namespace ns3 {
     }
 
     // The only constructor
-    CpuCoreGenerator::CpuCoreGenerator(Ptr<CpuFIFO> associatedCpuFIFO) {
+    CpuCoreGenerator::CpuCoreGenerator(Ptr<CpuFIFO> associatedCpuFIFO, ns3::Ptr<ns3::GlobalQueue>  globalqueue) {
         // default
         m_coreId         = 1;
         m_cpuCycle       = 1;
@@ -31,6 +31,7 @@ namespace ns3 {
         m_cpuReqDone     = false;
         m_newSampleRdy   = false;
         m_cpuCoreSimDone = false;
+        m_GlobalQueue      = globalqueue;
         m_logFileGenEnable = false;
         m_prevReqFinish    = true;
         m_prevReqFinishCycle = 0;
@@ -214,7 +215,7 @@ namespace ns3 {
         // schedule next run or finish simulation if processing end
         if (m_cpuReqDone == true && m_cpuRespCnt >= m_cpuReqCnt) {
           m_cpuCoreSimDone = true;
-          std::cout << "Cpu " << m_coreId << " Simulation End @ processor cycle # " << m_cpuCycle << std::endl;
+          std::cout << "Cpu " << m_coreId << " Simulation End @ processor cycle # " << m_cpuCycle <<"  Core2Core Transfers "<< m_GlobalQueue->m_Core2CoreTransfer << " Bank2Core Transfers "<<m_GlobalQueue->m_SharedBankTransfer<< std::endl;
         }
         else {
           // Schedule the next run

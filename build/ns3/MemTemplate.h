@@ -97,7 +97,7 @@ namespace ns3 {
       return m_FIFO.front();
     }
 
-    void EraseElement (int index) {
+    void EraseElement (int index) {      
       m_FIFO.erase(m_FIFO.begin()+index);
     }
 
@@ -187,6 +187,11 @@ namespace ns3 {
       bool     NoGetMResp;
       uint64_t sharedCacheAgent;
       uint64_t becameOldest;
+      uint64_t orderofArbitration; // 0: REQ:BANK:RESPONSE, 1: REQ:RESPONSE:BANK, 2: REQ:RESPONSE
+      bool     orderDetermined; 
+      uint64_t associateDeadline;
+      bool associateDeadline_final;
+      string currStage;  // "REQ", "BANK", "RESPONSE"
     };
 
     struct BusRespMsg {
@@ -200,6 +205,8 @@ namespace ns3 {
       uint8_t  data[8];
       uint64_t sharedCacheAgent;
     };
+
+    
 
     GenericDeque <BusReqMsg  > m_txMsgFIFO; // used as a local buffer when it used in SharedMem to save pending requests 
     GenericDeque <BusRespMsg > m_txRespFIFO;
@@ -219,6 +226,13 @@ namespace ns3 {
 
   class GlobalQueue : public ns3::Object {
     public:
+
+    struct BusMsgType {
+      uint64_t addr;
+      uint64_t msgId;
+      uint16_t reqCoreId;
+      uint16_t respCoreId;
+    };
     // Global Round Robin Queue                                      // Modified to Accomodate Multi Shared Cache
     std::vector <unsigned int> m_GlobalRRQueue;                            // Modified to Accomodate Multi Shared Cache
 
@@ -227,6 +241,11 @@ namespace ns3 {
 
     // Global Queue                                               // Modified to Accomodate Multi Shared Cache    
     GenericDeque <BusIfFIFO::BusReqMsg> m_GlobalReqFIFO;         // Modified to Accomodate Multi Shared Cache
+
+    GenericFIFO <BusIfFIFO::BusReqMsg> m_MsgType;
+
+    unsigned int m_Core2CoreTransfer;              
+    unsigned int m_SharedBankTransfer;
     
   };
 

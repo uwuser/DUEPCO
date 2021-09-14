@@ -61,6 +61,8 @@ namespace ns3 {
     // The output stream for internal ctrl(s) tracing
     std::ofstream m_ctrlsTrace;
 
+    ns3::Ptr<ns3::GlobalQueue> m_GlobalQueue;         // Modified to Accomodate Multi Shared Cache
+
      // A pointer to CPU Interface FIFO
      Ptr<CpuFIFO> m_cpuFIFO;
 
@@ -90,7 +92,7 @@ namespace ns3 {
     // CPU constructor must associated with two buffers
     // one for Request channel and the ohter for Received
     // response.
-    CpuCoreGenerator(Ptr<CpuFIFO> associatedCpuFIFO);
+    CpuCoreGenerator(Ptr<CpuFIFO> associatedCpuFIFO,ns3::Ptr<ns3::GlobalQueue>  globalqueue);
 
     // Generator's destructor
     ~CpuCoreGenerator();

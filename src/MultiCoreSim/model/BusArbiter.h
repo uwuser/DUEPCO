@@ -68,8 +68,13 @@ namespace ns3 {
     bool     m_ReqWbFlag[32];
     unsigned int candidateID;
     bool PendingTxReq;
+    uint16_t   m_sharedbankclks;
     int mode;
-          
+    string arb_req_mode;
+    string arb_resp_mode;
+    
+    
+
     bool m_reza_log;
 
     bool     m_stallDetectionEnable;
@@ -125,7 +130,7 @@ namespace ns3 {
 
     unsigned int retrieveSharedCacheID(uint64_t id);        // Modified to Accomodate Multi Shared Cache
 
-    unsigned int retrieveCacheFIFOID(uint64_t id);
+    unsigned int retrieveCacheFIFOID(uint64_t id);   
 
     bool isOldest(uint64_t adr, unsigned int coreIndex);              // Modified to Accomodate Multi Shared Cache
 
@@ -133,17 +138,25 @@ namespace ns3 {
 
     bool removeFromOldest(uint64_t adr, unsigned int coreIndex, bool replacement);      // Modified to Accomodate Multi Shared Cache
 
+    bool removeFromM_Type(uint64_t adr, unsigned int coreIndex, bool replacement);
+
     bool removeFromNonOldest(uint64_t adr, unsigned int coreIndex, bool replacement);     // Modified to Accomodate Multi Shared Cache
 
     bool existServiceQueue(BusIfFIFO::BusReqMsg & tempMsgQueue);
+
+    void assignDeadlineAfterDetermination(ns3::BusIfFIFO::BusReqMsg & msg);
 
     void adjustOldest(unsigned int coreIndex);                   // Modified to Accomodate Multi Shared Cache
     
     void SendData (BusIfFIFO::BusRespMsg msg, AGENT agent);  
     
+    bool WCLator();
+
     void SendMemCohrMsg (BusIfFIFO::BusReqMsg msg, bool BroadCast);
        
     bool CheckPendingWB (uint16_t core_idx, BusIfFIFO::BusRespMsg & wbMsg, bool CheckOnly);
+
+    void deadlineProgress();
 
     bool CheckPendingPutM (BusIfFIFO::BusReqMsg reqMsg, BusIfFIFO::BusReqMsg & putmReq);
     
@@ -225,6 +238,8 @@ namespace ns3 {
     void SetClkSkew (double clkSkew);
 
     void SetCacheBlkSize (uint32_t cacheBlkSize);
+
+    void SetSharedCacheLatency (uint32_t latency) ;
     
     void SetNumPrivCore (int nPrivCores);
 

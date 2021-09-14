@@ -984,7 +984,6 @@ namespace ns3
                     }
                     else if (txMsg.msgId == 0 && txMsg.wbCoreId == tempMsgQueue.wbCoreId && txMsg.addr == tempMsgQueue.addr && txMsg.cohrMsgId == tempMsgQueue.cohrMsgId)
                     {
-                        //cout<<"FUCKYYYYYYYYY"<<endl;
                         PendingTxReq = true;
                     }
                     m_GlobalQueue->m_GlobalOldestQueue.InsertElement(tempMsgQueue);

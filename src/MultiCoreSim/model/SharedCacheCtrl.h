@@ -66,6 +66,8 @@ namespace ns3 {
      bool       m_dramSimEnable;
      uint32_t   m_dramLatcy;
      uint32_t   m_dramOutstandReq;
+     uint32_t   m_reqclks;                
+     uint32_t   m_respclks;
      uint32_t   m_sharedcachelatency;     // Modified to Accomodate Multi Shared Cache
      uint32_t   m_sharedcachelatencyCounter;     // Modified to Accomodate Multi Shared Cache
      bool       m_sharedCacheBusy;     // Modified to Accomodate Multi Shared Cache
@@ -147,6 +149,8 @@ namespace ns3 {
      
      bool RemoveExclRespAddr ();
 
+     void assignDeadlineAfterDetermination(ns3::BusIfFIFO::BusReqMsg & msg);
+
      bool terminateBank(unsigned int coreID, uint64_t adr, unsigned int msg );                           // Modified to Accomodate Multi Shared Cache
 
      bool isOldest(uint64_t adr, unsigned int coreIndex);              // Modified to Accomodate Multi Shared Cache
@@ -158,6 +162,8 @@ namespace ns3 {
      bool removeFromOldest(uint64_t adr, unsigned int coreIndex);      // Modified to Accomodate Multi Shared Cache
 
      bool removeFromNonOldest(uint64_t adr, unsigned int coreIndex);     // Modified to Accomodate Multi Shared Cache
+
+     bool removeFromM_Type(uint64_t adr, unsigned int coreIndex); 
 
      void adjustOldest(unsigned int coreIndex);                   // Modified to Accomodate Multi Shared Cache
 
@@ -177,6 +183,8 @@ namespace ns3 {
      void CacheCtrlMain ();
      
      void CacheInitialize();
+
+     bool Bank_WCLator();
      
     void CohProtocolFSMProcessing (SNOOPSharedEventType eventType, int state, SNOOPSharedOwnerState owner);
     
@@ -231,6 +239,10 @@ namespace ns3 {
     void SetCacheType (uint16_t cacheType);
     
     void SetVictCacheSize (uint32_t cacheSize);
+
+    void SetNumReqCycles(int ncycle);  
+
+    void SetNumRespCycles(int ncycle);
 
     uint16_t GetCacheType ();
 

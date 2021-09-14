@@ -49,7 +49,7 @@ namespace ns3 {
         m_cohProtocol      = CreateObject<SNOOPPrivCohProtocol>();
         m_cpuPendingFIFO   = CreateObject<GenericFIFO <PendingMsg >> ();
         m_PendingWbFIFO.SetFifoDepth(assoicateBusIfFIFO->m_txMsgFIFO.GetFifoDepth());
-        m_mode             = "FCFS";
+        m_mode             = "RT";
         //m_mode             = "RT";
         m_reza_log_private = false; 
     }
@@ -140,6 +140,33 @@ namespace ns3 {
     void PrivateCacheCtrl::SetDt (double dt) {
       m_dt = dt;
     }
+    
+    void PrivateCacheCtrl::assignDeadlineAfterDetermination(ns3::BusIfFIFO::BusReqMsg &msg) {
+      cout<<"In the assignDeadlineAfterDetermination"<<endl;
+      //abort();
+      unsigned int WCL_0;
+      unsigned int WCL_1;
+      unsigned int WCL_2;
+      WCL_0 = 200;
+      WCL_1 = 200;
+      WCL_2 = 200; 
+      if(msg.orderDetermined) {
+        cout<<"determined become "<<msg.becameOldest<<endl;
+        switch (msg.orderofArbitration) {
+          case 0: 
+            msg.associateDeadline = WCL_0 - (m_cacheCycle - msg.becameOldest);          
+          break;
+          case 1: 
+           msg.associateDeadline = WCL_1 - (m_cacheCycle - msg.becameOldest);
+           break;
+          case 2: 
+            msg.associateDeadline = WCL_2 - (m_cacheCycle - msg.becameOldest);
+            break;
+        }
+        cout<<"deadline assigned "<<msg.associateDeadline<<endl;
+        msg.associateDeadline_final = true;
+      }      
+    }
 
     int PrivateCacheCtrl::GetDt () {
       return m_dt;
@@ -161,6 +188,24 @@ namespace ns3 {
       cout<<"retrieveCacheFIFOID cannot find  "<<id<<" as Shared Cache FIFO ID"<<endl;
       abort();
       return 0;
+    }
+
+    void associateDeadlinef (ns3::BusIfFIFO::BusReqMsg msg){
+      if(msg.msgId == 0 ){ 
+        //assign the correct one from here
+        cout<<"determine the tightest WC in PrivateCacheCtrl"<<endl;
+        // abort();
+        unsigned smallestWC = 200;
+        msg.associateDeadline = smallestWC;
+        msg.associateDeadline_final = false;
+      }
+      else{
+        unsigned smallestWC = 200;
+        msg.associateDeadline = smallestWC;
+        cout<<"determine the tightest WC in PrivateCacheCtrl"<<endl;
+        msg.associateDeadline_final = false;
+        //abort();
+      }      
     }
 
     void PrivateCacheCtrl::SetCache2Cache (bool cach2Cache) {
@@ -204,24 +249,21 @@ namespace ns3 {
             m_busIfFIFO->m_txMsgFIFO.InsertElement(tempBusReqMsg);
             return true;
          }
-         else if(!m_duetto && m_mode == "RT"){
+         else if((!m_duetto && m_mode == "RT") || m_duetto == true){
            if(m_reza_log_private) cout<<" PushMsgInBusTxFIFO  1   and the timestamp  &&&&&& "<<tempBusReqMsg.timestamp<<
               " buffer IFFIFO size "<<m_busIfFIFO->m_txMsgFIFO.GetQueueSize()<<" address "<<addr<<"   reqID  "<<reqCoreId<<endl;
+           if(m_reza_log_private && m_duetto == true) cout<<"PushMsgInBusTxFIFO  1 in m_duetto "<<endl;   
          // push the requestor in the RR global queue                                                 // Modified to Accomodate Multi Shared Cache       
          if(msgId == 0) {
-            //cout<<" 1  "<<endl;
            m_replacement = true; 
          }
-        // cout<<" 2  "<<endl;
          if(m_busIfFIFO->m_txMsgFIFO.IsEmpty()) {           
           // cout<<" 3  "<<endl;
            bool check = true;
            bool con = false;       
-           if(m_GlobalQueue->m_GlobalOldestQueue.GetQueueSize() == 0){
-             //cout<<" 4  "<<endl;
+           if(m_GlobalQueue->m_GlobalOldestQueue.GetQueueSize() == 0){           
              check = false;
            }
-            //cout<<" 5  "<<endl;
            for(int itr1 = 0; itr1 < m_GlobalQueue->m_GlobalOldestQueue.GetQueueSize() && con == false; itr1++ )  {                                            // Modified to Accomodate Multi Shared Cache           
            if(m_reza_log_private) cout<<"check if is empty  "<<endl;
              BusIfFIFO::BusReqMsg tempReq;
@@ -243,8 +285,7 @@ namespace ns3 {
                check = false;
                 if(m_reza_log_private) cout<<"================= Replacement ==================== reqCoreID "<<reqCoreId<<" wbCoreId "<<wbCoreId<<"  the address is "<<addr<<endl;
                if(m_reza_log_private) cout<<"This is replacement and msgID is zero  tempReq.reqCoreId "<<tempReq.reqCoreId<<" wbCoreId "<<wbCoreId<<"  the address is "<<tempReq.addr<<endl;
-                if ((tempReq.reqCoreId == wbCoreId && tempReq.msgId != 0) || (tempReq.wbCoreId == wbCoreId && tempReq.msgId == 0)){
-                  if(m_reza_log_private) cout<<"this mother fucker address is  "<<tempReq.addr<<" and have a msgID of "<<tempReq.msgId<<endl;
+                if ((tempReq.reqCoreId == wbCoreId && tempReq.msgId != 0) || (tempReq.wbCoreId == wbCoreId && tempReq.msgId == 0)){                  
                   check = true;
                   con = true;
               }
@@ -258,6 +299,7 @@ namespace ns3 {
               //cout<<"It is empty 6"<<endl;
               if(m_reza_log_private) cout<<" PUSHEDDDDDDDDDDDDDDDDDDDDDDD PUSHEDDDDDDDDDDDDDDDDDDD toldest address "<<addr<<"  reqID  "<<reqCoreId<<" wbID  "<<wbCoreId<<" msgId "<<msgId<<endl;
               tempBusReqMsg.becameOldest = m_cacheCycle;
+              associateDeadlinef(tempBusReqMsg);
               m_GlobalQueue->m_GlobalOldestQueue.InsertElement(tempBusReqMsg);       // Modified to Accomodate Multi Shared Cache              
               if(m_replacement) {
                 m_GlobalQueue->m_GlobalRRQueue.push_back(wbCoreId);            // Modified to Accomodate Multi Shared Cache
@@ -284,11 +326,12 @@ namespace ns3 {
             m_PendingWbFIFO.InsertElement(tempBusReqMsg);
             return true;
           }
-          else if (!m_duetto && m_mode == "RT") {
+          else if ((!m_duetto && m_mode == "RT") || m_duetto == true) {
             if(m_replacement == true) {
               if(m_reza_log_private) cout<<"in pending there is a replacement "<<endl;
               abort();
             }
+            if(m_reza_log_private && m_duetto == true) cout<<"PushMsgInBusTxFIFO  2 in m_duetto "<<endl;   
             if(m_reza_log_private) cout<<" PushMsgInBusTxFIFO  2   and the timestamp  &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& address "<<addr<<"  reqID  "<<reqCoreId<<endl;
             bool check = true;    
             bool con = false;   
@@ -312,6 +355,7 @@ namespace ns3 {
             if(!check) {  // Modified to Accomodate Multi Shared Cache
             if(m_reza_log_private) cout<<" PUSHEDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD PUSHEDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD "<<reqCoreId<<endl;
                 tempBusReqMsg.becameOldest = m_cacheCycle;
+                associateDeadlinef(tempBusReqMsg);
                 m_GlobalQueue->m_GlobalOldestQueue.InsertElement(tempBusReqMsg);                                              // Modified to Accomodate Multi Shared Cache
                 m_GlobalQueue->m_GlobalRRQueue.push_back(reqCoreId);            // Modified to Accomodate Multi Shared Cache
                 
@@ -836,6 +880,7 @@ namespace ns3 {
         */
        if (currProcEvent == SNOOPPrivEventType::ReqBus) {
          if(m_reza_log_private) cout<<"Process ReqBus"<<endl;
+         
          if (currEventCtrlAction == SNOOPPrivCtrlAction::Hit) { 
            // Remove message from the busReq buffer
            m_busIfFIFO->m_rxMsgFIFO.PopElement();
@@ -860,7 +905,36 @@ namespace ns3 {
                   currEventCtrlAction == SNOOPPrivCtrlAction::SendCoreOnly ||
                   currEventCtrlAction == SNOOPPrivCtrlAction::SendCoreMem  ||
                   currEventCtrlAction == SNOOPPrivCtrlAction::HitSendMemOnly) {
-                  
+
+
+           if(currEventCtrlAction == SNOOPPrivCtrlAction::WritBack) cout<<"From "<<m_coreId<<" It is WriteBack"<<endl;
+
+           if(currEventCtrlAction == SNOOPPrivCtrlAction::SendMemOnly) {
+             cout<<"From "<<m_coreId<<" It is SendMemOnly"<<endl;
+             busReqMsg.orderDetermined = true;
+             busReqMsg.orderofArbitration = 1;
+             busReqMsg.currStage = "REQ";
+             assignDeadlineAfterDetermination(busReqMsg);
+             m_GlobalQueue->m_MsgType.InsertElement(busReqMsg);
+           }
+           else if(currEventCtrlAction == SNOOPPrivCtrlAction::SendCoreOnly) {
+             cout<<"From "<<m_coreId<<" It is SendCoreOnly"<<endl;
+             busReqMsg.orderDetermined = true;
+             busReqMsg.orderofArbitration = 2;
+             busReqMsg.currStage = "REQ";
+             assignDeadlineAfterDetermination(busReqMsg);
+             m_GlobalQueue->m_MsgType.InsertElement(busReqMsg);
+           } 
+           else if(currEventCtrlAction == SNOOPPrivCtrlAction::SendCoreMem) {
+             cout<<"From "<<m_coreId<<" It is SendCoreMem"<<endl;
+             busReqMsg.orderDetermined = true;
+             busReqMsg.orderofArbitration = 1;
+             busReqMsg.currStage = "REQ";
+             assignDeadlineAfterDetermination(busReqMsg);
+             m_GlobalQueue->m_MsgType.InsertElement(busReqMsg);
+           } 
+
+                   
            if (currEventCtrlAction == SNOOPPrivCtrlAction::HitSendMemOnly) { // do hit
              // Remove message from core's pending-buffer
              if (PendingCoreBufRemoveMsg(busReqMsg.msgId, cpuPendingMsg) == true) {
@@ -929,6 +1003,18 @@ namespace ns3 {
          else if (currEventCtrlAction == SNOOPPrivCtrlAction::SaveWbCoreId) {
            m_busIfFIFO->m_rxMsgFIFO.PopElement();
            // save pending write back coreId & address
+           
+            cout<<"From "<<m_coreId<<" save write back coreID msgID is "<<busReqMsg.msgId<<endl;   
+            busReqMsg.orderDetermined = true;
+            busReqMsg.orderofArbitration = 2;
+            busReqMsg.currStage = "REQ";
+            
+            assignDeadlineAfterDetermination(busReqMsg);
+            
+
+            cout<<"associate deadline is "<<busReqMsg.associateDeadline<<endl;
+            m_GlobalQueue->m_MsgType.InsertElement(busReqMsg);            
+
            if(m_reza_log_private) cout<<"SAVEWBCOREID %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"<<endl;
            if (!PushMsgInBusTxFIFO (busReqMsg.msgId, busReqMsg.reqCoreId, m_coreId,currEventCohrTrans, busReqMsg.addr, busReqMsg.sharedCacheAgent, true)) {
                 std::cout << "PrivCache: Pending Wb buffer is full !!!!" << std::endl;
@@ -940,7 +1026,8 @@ namespace ns3 {
              // remove no-action event
              m_busIfFIFO->m_rxMsgFIFO.PopElement();
            }
-           else if(!m_duetto && m_mode == "RT") {
+           else if((!m_duetto && m_mode == "RT") || m_duetto == true) {
+             if(m_reza_log_private && m_duetto == true) cout<<"noACK and replacement no ack "<<endl;   
              // remove no-action event
 
              /*** if the req msg is replacement and there is no Ack, it means that there is no need
@@ -950,7 +1037,6 @@ namespace ns3 {
              m_replacement_temp = m_busIfFIFO->m_rxMsgFIFO.GetFrontElement();
              m_busIfFIFO->m_rxMsgFIFO.PopElement();
              if(m_replacement_temp.msgId == 0 && m_replacement_temp.wbCoreId == m_busIfFIFO->m_fifo_id){ /*** va own bashe na other**/
-               //cout<<"Fuck you now  reqCoreID "<<m_replacement_temp.reqCoreId<<"   wbcoreD  "<<m_replacement_temp.wbCoreId<<"   the address is  "<<m_replacement_temp.addr<<endl;
 
                // Remove from Oldest queue 
                 bool success = false;

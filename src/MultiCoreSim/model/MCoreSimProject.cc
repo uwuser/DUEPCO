@@ -75,7 +75,7 @@ cout<<"----------------------------------------------------Start Setting Configu
      /* 
       * instantiate cpu cores
      */
-     Ptr<CpuCoreGenerator> newCpuCore = CreateObject<CpuCoreGenerator> (newCpuFIFO);
+     Ptr<CpuCoreGenerator> newCpuCore = CreateObject<CpuCoreGenerator> (newCpuFIFO, m_GlobalQueue);
      stringstream bmTraceFile, cpuTraceFile, ctrlTraceFile;
      bmTraceFile   << projectXmlCfg.GetBMsPath() <<"/trace_C" << PrivateCacheXml.GetCacheId() << ".trc.shared";
      cpuTraceFile  << projectXmlCfg.GetBMsPath() <<"/" << projectXmlCfg.GetCpuTraceFile() << PrivateCacheXml.GetCacheId() << ".txt";
@@ -201,6 +201,8 @@ cout<<"----------------------------------------------------Start Setting Configu
    new_SharedCacheCtrl->SetCachePreLoad      (SharedCacheXml.GetCachePreLoad()),                        // Modified to Accomodate Multi Shared Cache
    new_SharedCacheCtrl->SetDramSimEnable     (projectXmlCfg.GetDRAMSimEnable());                        // Modified to Accomodate Multi Shared Cache
    new_SharedCacheCtrl->SetDramFxdLatcy      (projectXmlCfg.GetDRAMFixedLatcy());                       // Modified to Accomodate Multi Shared Cache
+   new_SharedCacheCtrl->SetNumReqCycles      (L1BusCnfg.GetReqBusLatcy()    );
+   new_SharedCacheCtrl->SetNumRespCycles     (L1BusCnfg.GetRespBusLatcy()   );
    new_SharedCacheCtrl->SetDramModel         (projectXmlCfg.GetDRAMModle()    );                        // Modified to Accomodate Multi Shared Cache
    new_SharedCacheCtrl->SetDramOutstandReq   (projectXmlCfg.GetDRAMOutstandReq());                      // Modified to Accomodate Multi Shared Cache
    new_SharedCacheCtrl->SetSharedCacheLatency(SharedCacheXml.GetSharedCacheLat());                      // Modified to Accomodate Multi Shared Cache
@@ -309,8 +311,9 @@ cout<<"----------------------------------------------------Start Setting Configu
    m_busArbiter->SetBusArbitration   (L1BusCnfg.GetBusArbitration() );
    m_busArbiter->SetReqBusArb        (L1BusCnfg.GetReqBusArb()      );
    m_busArbiter->SetRespBusArb       (L1BusCnfg.GetRespBusArb()     );
-   m_busArbiter->SetCohProtType      (m_cohrProt                    );
-   m_busArbiter->SetMaxPendingReq    (m_maxPendReq                  );
+   m_busArbiter->SetCohProtType         (m_cohrProt                    );
+   m_busArbiter->SetSharedCacheLatency  (SharedCacheXml.GetSharedCacheLat());                      // Modified to Accomodate Multi Shared Cache
+   m_busArbiter->SetMaxPendingReq       (m_maxPendReq                  );
    m_busArbiter->SetLogFileGenEnable (m_logFileGenEnable            ); 
    
   /*

@@ -543,7 +543,10 @@ namespace ns3 {
       if (m_processEvent == SNOOPPrivEventType::RespBus) {
         std::cout << "\nSNOOPPrivCohProtocol: CoreId = " << m_coreId << " has Msg on the RxResp Bus" << std::endl;
         std::cout << "\t\t BusEventName        = " << PrivRespBusEventName(m_eventList.busRespEvent) << std::endl;
-        std::cout << "\t\t ReqCoreId           = " << m_msgList.busRespMsg.reqCoreId << ", RespCoreId = " << m_msgList.busRespMsg.respCoreId << ", Agent = " << m_msgList.busRespMsg.sharedCacheAgent << ", ReqMsgId = " << m_msgList.busRespMsg.msgId << ", Req Addr  = " << m_msgList.busRespMsg.addr << " CacheLine = " << m_eventCacheInfoList.busRespCacheLineInfo.cl_idx << std::endl;
+        if(m_msgList.busRespMsg.respCoreId >= 10 )
+          std::cout << "\t\t ReqCoreId           = " << m_msgList.busRespMsg.reqCoreId << ", RespCoreId = " << m_msgList.busRespMsg.respCoreId << ", Agent = " << m_msgList.busRespMsg.sharedCacheAgent << ", ReqMsgId = " << m_msgList.busRespMsg.msgId << ", Req Addr  = " << m_msgList.busRespMsg.addr << " CacheLine = " << m_eventCacheInfoList.busRespCacheLineInfo.cl_idx << std::endl;
+        else 
+          std::cout << "\t\t ReqCoreId           = " << m_msgList.busRespMsg.reqCoreId << ", RespCoreId = " << m_msgList.busRespMsg.respCoreId << ", Agent = " << m_msgList.busRespMsg.respCoreId << ", ReqMsgId = " << m_msgList.busRespMsg.msgId << ", Req Addr  = " << m_msgList.busRespMsg.addr << " CacheLine = " << m_eventCacheInfoList.busRespCacheLineInfo.cl_idx << std::endl;
         std::cout << "\t\t CacheLine Info: \n\t\t\t IsExist         =  " << m_eventCacheInfoList.busRespCacheLineInfo.IsExist << " \n\t\t\t IsValid         =  " << m_eventCacheInfoList.busRespCacheLineInfo.IsValid <<  " \n\t\t\t Set_Idx         =  " << m_eventCacheInfoList.busRespCacheLineInfo.set_idx << " \n\t\t\t Way_Idx         =  " << m_eventCacheInfoList.busRespCacheLineInfo.way_idx << std::endl;
         std::cout << "\t\t\t CurrState       = " << PrintPrivStateName(m_currEventCurrState) << std::endl;
         std::cout << "\t\t\t NextState       = " << PrintPrivStateName(m_currEventNextState) << std::endl;

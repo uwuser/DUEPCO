@@ -36,13 +36,13 @@
     	busClkNanoSec="100"
     	busClkSkew="0" 
     	BusArch="split"
-    	BusArb="FCFS"                      
-    	ReqBusArb="FCFS"
-    	RespBusArb="FCFS"
+    	BusArb="RT"                      
+    	ReqBusArb="TDM"
+    	RespBusArb="RR"
     	ReqBusLat="4"
     	RespBusLat="20"
     	WrkConserv="1"
-		Duetto="0">
+		Duetto="1">
     </L1BusCnfg>
   </InterConnect>
   
@@ -164,6 +164,7 @@
   <sharedCaches>
     <sharedCache 
     	cacheId="10" 
+
     	cpuClkMHz="100" 
     	cpuClkSkew="60" 
     	ctrlClkMHz="200" 
@@ -212,8 +213,8 @@
     	cacheSize="268435456" 
     	mapping="1" 
 		cachelatency="20"
-    	nways="8">
-    </sharedCache>		  -->
+    	nways="8"> -->
+    </sharedCache>		 
   </sharedCaches>
   <DRAMCnfg
        DRAMSIMEnable="0"
