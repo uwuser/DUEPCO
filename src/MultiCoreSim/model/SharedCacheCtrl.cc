@@ -229,15 +229,62 @@ namespace ns3 {
       return m_Nreqs;
     }
 
-    bool SharedCacheCtrl::Bank_WCLator() {
+    bool SharedCacheCtrl::Bank_WCLator() {    
+      if (m_reza_log) cout<<"------------------------------------------------------WCLator in Arbiter------------------------------------------------------"<<endl;
+      if (m_reza_log && m_GlobalQueue->m_GlobalOldestQueue.GetQueueSize() >0)
+        cout << "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ Global Oldest Queue Contains the Following WCLATOR  ++++++++++++++++++++++++++++++++++++++++++++++++++++++" << endl;
+      if (m_reza_log)
+      {
+        for (int u = 0; u < m_GlobalQueue->m_GlobalOldestQueue.GetQueueSize(); u++)
+        {
+          BusIfFIFO::BusReqMsg tempOldestReqMsgTemp;
+          tempOldestReqMsgTemp = m_GlobalQueue->m_GlobalOldestQueue.GetFrontElement();
+          m_GlobalQueue->m_GlobalOldestQueue.PopElement();
+          cout << "AT " << u << " ADDR " << tempOldestReqMsgTemp.addr << "  ReqID  " << tempOldestReqMsgTemp.reqCoreId << "  wbID  " << tempOldestReqMsgTemp.wbCoreId << "  MSGID " << tempOldestReqMsgTemp.msgId << "  AGENT  " << tempOldestReqMsgTemp.sharedCacheAgent << endl;
+          m_GlobalQueue->m_GlobalOldestQueue.InsertElement(tempOldestReqMsgTemp);
+        }
+      }
 
       
-      if(m_reza_log_shared) cout<<"WCLator in Bank "<<m_coreId<<endl;
-      bool logWclator = false;
+      if (m_reza_log)
+        cout << "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ Global Service Queue Contains the Following ++++++++++++++++++++++++++++++++++++++++++++++++++++++" << endl;
+      if (m_reza_log)
+      {
+        for (int u = 0; u < m_GlobalQueue->m_GlobalReqFIFO.GetQueueSize(); u++)
+        {
+          BusIfFIFO::BusReqMsg tempNonOldestReqMsgTemp;
+          tempNonOldestReqMsgTemp = m_GlobalQueue->m_GlobalReqFIFO.GetFrontElement();
+          m_GlobalQueue->m_GlobalReqFIFO.PopElement();
+          cout << "AT " << u << " ADDR " << tempNonOldestReqMsgTemp.addr << "  ReqID  " << tempNonOldestReqMsgTemp.reqCoreId << "  wbID  " << tempNonOldestReqMsgTemp.wbCoreId << "  MSGID " << tempNonOldestReqMsgTemp.msgId << "  AGENT  " << tempNonOldestReqMsgTemp.sharedCacheAgent << endl;
+          m_GlobalQueue->m_GlobalReqFIFO.InsertElement(tempNonOldestReqMsgTemp);
+        }
+      }
+      
+      if (m_reza_log && m_GlobalQueue->m_MsgType.GetQueueSize() > 0 )
+      {
+        cout<<"*********************** Content of the M_Type******************* Begning of WCLATOR  the size is "<<m_GlobalQueue->m_MsgType.GetQueueSize()<<endl;  
+        for (int u = 0; u < m_GlobalQueue->m_MsgType.GetQueueSize(); u++)
+        {
+          BusIfFIFO::BusReqMsg tempOldestReqMsgTemp_mtype;
+          tempOldestReqMsgTemp_mtype = m_GlobalQueue->m_MsgType.GetFrontElement();
+          m_GlobalQueue->m_MsgType.PopElement();
+          cout << "AT " << u << " ADDR " << tempOldestReqMsgTemp_mtype.addr << "  ReqID  " << tempOldestReqMsgTemp_mtype.reqCoreId << "  wbID  " << tempOldestReqMsgTemp_mtype.wbCoreId << "  MSGID " << tempOldestReqMsgTemp_mtype.msgId << "  AGENT  " << tempOldestReqMsgTemp_mtype.sharedCacheAgent << " curr stage "<< tempOldestReqMsgTemp_mtype.currStage<<endl;
+          m_GlobalQueue->m_MsgType.InsertElement(tempOldestReqMsgTemp_mtype);
+        }
+        cout<<"*************************************************************"<<endl; 
+      }
 
-      unsigned int deadline, latency, WCLatorReqID, currentOrder;    
+      for (unsigned int i = 0; i < m_GlobalQueue->m_GlobalRRQueue.size(); i++)
+      {
+        if (m_reza_log)
+          cout << " Order is: " << m_GlobalQueue->m_GlobalRRQueue.at(i) << endl;
+      }
+      
+
+
+      unsigned int deadline, latency, WCLatorReqID, currentOrder;
       unsigned int B_1, B_2, B_3;
-      unsigned int k_a, k_b, k_c, k_d, k_e;
+      unsigned int k_a, k_b, k_c, k_d, k_e;    
 
       B_1 = m_reqclks - 1;
       B_2 = m_sharedcachelatency - 1;
@@ -247,7 +294,9 @@ namespace ns3 {
       tempFromOldest = m_GlobalQueue->m_GlobalOldestQueue;
 
       if(!m_GlobalQueue->m_GlobalOldestQueue.IsEmpty()){    
+        //cout<<"size of oldest is "<<m_GlobalQueue->m_GlobalOldestQueue.GetQueueSize()<<endl;
         for (int it5 = 0; it5 < m_GlobalQueue->m_GlobalOldestQueue.GetQueueSize(); it5++) {
+          //cout<<"On it5 "<<it5<<endl;
           currentOrder = 100;
           WCLatorReqID = 100;
           deadline = 100;
@@ -262,10 +311,13 @@ namespace ns3 {
           BusIfFIFO::BusReqMsg tempOldestMsgQueueWCLator_FromMemType;
           BusIfFIFO::BusReqMsg tempOldestMsgQueueWCLator_FromMemType_1;
           BusIfFIFO::BusReqMsg tempOldestMsgQueueWCLator_FromMemType_local;
+
           tempOldestMsgQueueWCLator = m_GlobalQueue->m_GlobalOldestQueue.GetFrontElement();
+          //cout<<"MSGID "<<tempOldestMsgQueueWCLator.msgId<<" popped "<<endl;
           m_GlobalQueue->m_GlobalOldestQueue.PopElement();
           WCLatorReqID = tempOldestMsgQueueWCLator.msgId == 0 ? tempOldestMsgQueueWCLator.wbCoreId : tempOldestMsgQueueWCLator.reqCoreId;        
-          if(logWclator) cout<<"WCLator in Bank Done ReqID "<<WCLatorReqID<<endl;
+          
+          
           bool RR_Con = false;
           // Retrieve the RR Order
           for (unsigned int it6 = 0; it6 < m_GlobalQueue->m_GlobalRRQueue.size() && RR_Con == false; it6++) {
@@ -274,9 +326,14 @@ namespace ns3 {
               RR_Con = true;
             }
           }
-          if(logWclator) cout<<"WCLator in Bank Done order "<<currentOrder<<endl;
+          
+
+          
+          //cout<<"1  "<<tempOldestMsgQueueWCLator_FromMemType.associateDeadline_final<<" order "<<tempOldestMsgQueueWCLator_FromMemType.orderofArbitration<<endl;
           // Retrieve the Deadline
-          bool terminatei = false;
+          //cout<<"1"<<endl;
+          bool terminatei = false;        
+          
           for(int ii1=0; ii1<m_GlobalQueue->m_MsgType.GetQueueSize() && terminatei == false; ii1++) {                         
             //cout<<"2"<<endl;
             //cout<<"tempOldestMsgQueueWCLator "<<tempOldestMsgQueueWCLator.msgId<<" adr "<<tempOldestMsgQueueWCLator.addr<<endl;
@@ -295,112 +352,165 @@ namespace ns3 {
               m_GlobalQueue->m_MsgType.InsertElement(tempOldestMsgQueueWCLator_FromMemType_1);
             }
           }
-
-
-          cout<<"For ReqID "<<WCLatorReqID<<" and msgID "<<tempOldestMsgQueueWCLator.msgId<<" the RR order is "<<currentOrder<<" deadline "<<deadline<<endl;
-          
+          cout<<"------------------------------------------------------------------------------------------------------------------------------------"<<endl;
+          cout<<"For ReqID "<<WCLatorReqID<<" and msgID "<<tempOldestMsgQueueWCLator.msgId<<" the RR order is "<<currentOrder<<" order of arbitration "<<tempOldestMsgQueueWCLator_FromMemType.orderofArbitration<<" deadline "<<deadline<<endl;
+          //cout<<"3  "<<tempOldestMsgQueueWCLator_FromMemType.associateDeadline_final<<" order "<<tempOldestMsgQueueWCLator_FromMemType.orderofArbitration<<endl;
           // Extract the k_a, k_b, k_c, k_d, and k_e
           unsigned tempOrderFront;
           unsigned int GlobalQueueSize = m_GlobalQueue->m_GlobalRRQueue.size();
           for (unsigned int it8 = 0; it8 < GlobalQueueSize; it8++) {
-            if(currentOrder != m_GlobalQueue->m_GlobalRRQueue.at(it8)){
+            if(currentOrder > it8){    
+                  
+              //cout<<"1 WCLator in Arbiter Done with Ka "<<k_a<<" Kb "<<k_b<<" Kc "<<k_c<<" Kd "<<k_d<<" Ke "<<k_e<<endl;
               tempOrderFront = m_GlobalQueue->m_GlobalRRQueue.at(it8);
+              cout<<"tempOrderFront  "<<tempOrderFront<<endl;   
               bool nextInMemType = false;
+              bool notDetermined = false;
+              //cout<<"size of global "<<tempFromOldest.GetQueueSize()<<endl;
               for (int it9 = 0; it9 < tempFromOldest.GetQueueSize() && nextInMemType == false; it9++) {
                 tempOldestMsgQueueWCLator_FromMemType_local = tempFromOldest.GetFrontElement();
-                tempFromOldest.PopElement();
-                if((tempOldestMsgQueueWCLator_FromMemType_local.msgId == 0 && tempOldestMsgQueueWCLator_FromMemType_local.wbCoreId == tempOrderFront) 
-                    || (tempOldestMsgQueueWCLator_FromMemType_local.msgId != 0 && tempOldestMsgQueueWCLator_FromMemType_local.reqCoreId == tempOrderFront)) {
-                  tempFromOldest.InsertElement(tempOldestMsgQueueWCLator_FromMemType_local);                  
-                  for(int ii2=0; ii2<m_GlobalQueue->m_MsgType.GetQueueSize() && nextInMemType == false; ii2++){
+                //cout<<"in the inner loopp "<<tempOldestMsgQueueWCLator_FromMemType_local.msgId<<" popped "<<endl;
+                tempFromOldest.PopElement();              
+                if(((tempOldestMsgQueueWCLator_FromMemType_local.msgId == 0 && tempOldestMsgQueueWCLator_FromMemType_local.wbCoreId == tempOrderFront) 
+                  || (tempOldestMsgQueueWCLator_FromMemType_local.msgId != 0 && tempOldestMsgQueueWCLator_FromMemType_local.reqCoreId == tempOrderFront)) ) {                  
+                  tempFromOldest.InsertElement(tempOldestMsgQueueWCLator_FromMemType_local);         
+                  //cout<<"in the inner loopp "<<tempOldestMsgQueueWCLator_FromMemType_local.msgId<<" added back "<<endl;         
+                  for(int ii2=0; ii2<m_GlobalQueue->m_MsgType.GetQueueSize() && nextInMemType == false; ii2++) {               
                     BusIfFIFO::BusReqMsg tempMemType;
                     tempMemType = m_GlobalQueue->m_MsgType.GetFrontElement();
                     m_GlobalQueue->m_MsgType.PopElement();
-                    if(tempMemType.msgId == tempOldestMsgQueueWCLator_FromMemType_local.msgId && tempMemType.addr == tempOldestMsgQueueWCLator_FromMemType_local.addr) {                       
+                    if(tempOrderFront == WCLatorReqID) notDetermined = true;
+                    cout<<"found in the memtype  from the oldest order of arbitration "<<tempOldestMsgQueueWCLator_FromMemType.orderofArbitration<<" bank agent "<<tempOldestMsgQueueWCLator_FromMemType_local.sharedCacheAgent<<"  id is "<<tempOldestMsgQueueWCLator_FromMemType_local.msgId<<endl;
+                    cout<<"found in the memtype  from the in front of order of arbitration "<<tempMemType.orderofArbitration<<" bank agent "<<tempMemType.sharedCacheAgent<<"  id is "<<tempMemType.msgId<<endl;                     
+                    if(tempMemType.msgId == tempOldestMsgQueueWCLator_FromMemType_local.msgId && tempMemType.addr == tempOldestMsgQueueWCLator_FromMemType_local.addr && tempOrderFront != WCLatorReqID) {
+                      cout<<"inside"<<endl;
+                      notDetermined = true;
                       if(tempOldestMsgQueueWCLator_FromMemType.orderofArbitration == tempMemType.orderofArbitration && tempOldestMsgQueueWCLator_FromMemType.sharedCacheAgent == tempMemType.sharedCacheAgent){
-                        // Extract the k_a      
+                        // Extract the k_a
+                        
+                        //abort();
                         k_a++;
+                        cout<<"k_a incremented "<<k_a<<endl;
                         nextInMemType = true;
                       }
                       else if (tempOldestMsgQueueWCLator_FromMemType.orderofArbitration == tempMemType.orderofArbitration && tempOldestMsgQueueWCLator_FromMemType.sharedCacheAgent != tempMemType.sharedCacheAgent) {
                         // Extract the k_b
+                        //cout<<"Check the sharedcacheagent is known for both of these temporary request "<<tempMemType.orderofArbitration<<endl;
+                        //abort();
                         k_b++;
+                        cout<<"k_b incremented "<<k_b<<endl;
                         nextInMemType = true;
                       }   
                       else if ((tempOldestMsgQueueWCLator_FromMemType.orderofArbitration == 0 && tempMemType.orderofArbitration == 1 && tempOldestMsgQueueWCLator_FromMemType.sharedCacheAgent == tempMemType.sharedCacheAgent)
                             || (tempOldestMsgQueueWCLator_FromMemType.orderofArbitration == 1 && tempMemType.orderofArbitration == 0 && tempOldestMsgQueueWCLator_FromMemType.sharedCacheAgent == tempMemType.sharedCacheAgent)) {
                         // Extract the k_c
+                        //cout<<"Check the sharedcacheagent is known for both of these temporary request "<<tempMemType.orderofArbitration<<endl;
+                        //abort();
                         k_c++;
+                        cout<<"k_c incremented "<<k_c<<endl;
                         nextInMemType = true;
                       }  
                       else if ((tempOldestMsgQueueWCLator_FromMemType.orderofArbitration == 0 && tempMemType.orderofArbitration == 1 && tempOldestMsgQueueWCLator_FromMemType.sharedCacheAgent != tempMemType.sharedCacheAgent)
                             || (tempOldestMsgQueueWCLator_FromMemType.orderofArbitration == 1 && tempMemType.orderofArbitration == 0 && tempOldestMsgQueueWCLator_FromMemType.sharedCacheAgent != tempMemType.sharedCacheAgent)) {
-                        // Extract the k_d     
+                        // Extract the k_d      
+                        //cout<<"Check the sharedcacheagent is known for both of these temporary request "<<tempMemType.orderofArbitration<<endl;
+                        //abort();
                         k_d++;
+                        cout<<"k_d incremented "<<k_d<<endl;
                         nextInMemType = true;
                       }  
                       else if ((tempOldestMsgQueueWCLator_FromMemType.orderofArbitration == 0 && tempMemType.orderofArbitration == 3) || (tempOldestMsgQueueWCLator_FromMemType.orderofArbitration == 3 && tempMemType.orderofArbitration == 0)){
                         // Extract the k_e
+                        //cout<<"Check the sharedcacheagent is known for both of these temporary request  "<<tempMemType.orderofArbitration<<endl;
+                        //abort();
                         k_e++;
+                        cout<<"k_e incremented "<<k_e<<endl;
                         nextInMemType = true;
-                      }                
+                      }
+                      //cout<<"2- WCLator in Arbiter Done with Ka "<<k_a<<" Kb "<<k_b<<" Kc "<<k_c<<" Kd "<<k_d<<" Ke "<<k_e<<endl;                
                       m_GlobalQueue->m_MsgType.InsertElement(tempMemType);
                     }
                     else{
                       m_GlobalQueue->m_MsgType.InsertElement(tempMemType);
                     }
+                    /** here it means that we went over the queue of MemType but we could not find the oldest request meaning that it is not determined yet. 
+                     * hence, we need to consider the worst possible case until it can be determined **/                  
+                    if((ii2 == (m_GlobalQueue->m_MsgType.GetQueueSize()-1)) && notDetermined == false) {
+                      cout<<"the request oldest id "<<tempOldestMsgQueueWCLator_FromMemType_local.msgId<<" is not determined yet hence adding one to kc to resemble the worst case "<<endl;
+                      k_c++;
+                    }
                   }
                 }
                 else{
+                  //cout<<"in the inner loopp "<<tempOldestMsgQueueWCLator_FromMemType_local.msgId<<" added back "<<endl;
                   tempFromOldest.InsertElement(tempOldestMsgQueueWCLator_FromMemType_local);
                 }
               }
             }
+            //cout<<"WCLator in Arbiter Done with Ka "<<k_a<<" Kb "<<k_b<<" Kc "<<k_c<<" Kd "<<k_d<<" Ke "<<k_e<<endl;
           }
+          
           cout<<"Final WCLator in Arbiter Done with Ka "<<k_a<<" Kb "<<k_b<<" Kc "<<k_c<<" Kd "<<k_d<<" Ke "<<k_e<<endl;
+
+
+
+
+
+
           // Estimate the latency
           latency = 0;
-          if(tempOldestMsgQueueWCLator_FromMemType.orderDetermined && tempOldestMsgQueueWCLator_FromMemType.associateDeadline_final){
+          if((tempOldestMsgQueueWCLator_FromMemType.orderDetermined == true) && (tempOldestMsgQueueWCLator_FromMemType.associateDeadline_final==true)){
+            //cout<<"4"<<endl;
             switch (tempOldestMsgQueueWCLator_FromMemType.orderofArbitration)
             {
+              
             case 0:
               /* REQ:BANK:RESPONSE */            
               if(tempOldestMsgQueueWCLator_FromMemType.currStage == "REQ") {
                 // The request finished proceed REQ stage
+                cout<<"Latency Est. 1 for ID "<<tempOldestMsgQueueWCLator_FromMemType.msgId<<"  Addr  "<<tempOldestMsgQueueWCLator_FromMemType.addr<<endl;
                 latency = B_2 + B_3 + m_sharedcachelatency + m_respclks + (k_a) * max(m_sharedcachelatency,m_respclks) 
                     + (k_b + k_d + k_e) * (m_respclks) + k_c * max(m_sharedcachelatency,m_respclks); 
+                    
               }
               else if(tempOldestMsgQueueWCLator_FromMemType.currStage == "BANK"){
+                cout<<"Latency Est. 2 for ID "<<tempOldestMsgQueueWCLator_FromMemType.msgId<<"  Addr  "<<tempOldestMsgQueueWCLator_FromMemType.addr<<endl;
                 // The request finished its second stage
                 latency = B_3 + m_respclks + (k_a) * m_respclks 
                     + (k_b + k_d + k_e) * (m_respclks) + k_c * m_respclks; 
               }
               else if(tempOldestMsgQueueWCLator_FromMemType.currStage == "RESPONSE"){
+                cout<<"Latency Est. 3 for ID "<<tempOldestMsgQueueWCLator_FromMemType.msgId<<"  Addr  "<<tempOldestMsgQueueWCLator_FromMemType.addr<<endl;
                 // The request finished its last stage
                 latency = 1;
               }
-              else {
-                latency = B_1 + B_2 + B_3 + m_reqclks + m_sharedcachelatency + m_respclks + (k_a) * max(m_reqclks,max(m_sharedcachelatency,m_respclks)) 
-                    + (k_b + k_d + k_e) * (m_reqclks + m_respclks) + k_c * max(m_sharedcachelatency,m_respclks); 
+              else {              
+                cout<<"Latency Est. 4 for ID "<<tempOldestMsgQueueWCLator_FromMemType.msgId<<"  Addr  "<<tempOldestMsgQueueWCLator_FromMemType.addr<<endl;              
+                latency = B_1 + B_2 + B_3 + m_reqclks + m_sharedcachelatency + m_respclks + ((k_a) * max(m_reqclks,max(m_sharedcachelatency,m_respclks))) 
+                    + ((k_b + k_d + k_e) * (m_reqclks + m_respclks)) + (k_c * max(m_sharedcachelatency,m_respclks)); 
               }
               break;
             case 1:
               /* REQ:RESPONSE:BANK */
               if(tempOldestMsgQueueWCLator_FromMemType.currStage == "REQ") {
+                cout<<"Latency Est. 5 for ID "<<tempOldestMsgQueueWCLator_FromMemType.msgId<<"  Addr  "<<tempOldestMsgQueueWCLator_FromMemType.addr<<endl;
                 // The request finished proceed REQ stage
                 latency = B_2 + B_3 + m_sharedcachelatency + m_respclks + (k_a) * max(m_sharedcachelatency,m_respclks) 
                     + (k_b + k_d + k_e) * (m_respclks) + k_c * max(m_sharedcachelatency,m_respclks); 
               }
               else if(tempOldestMsgQueueWCLator_FromMemType.currStage == "RESPONSE"){
+                cout<<"Latency Est. 6 for ID "<<tempOldestMsgQueueWCLator_FromMemType.msgId<<"  Addr  "<<tempOldestMsgQueueWCLator_FromMemType.addr<<endl;
                 // The request finished its second last stage
                 latency = B_2 + m_sharedcachelatency + (k_a) * m_sharedcachelatency 
                     + k_c * m_sharedcachelatency; 
               }
               else if(tempOldestMsgQueueWCLator_FromMemType.currStage == "BANK"){
+                cout<<"Latency Est. 7 for ID "<<tempOldestMsgQueueWCLator_FromMemType.msgId<<"  Addr  "<<tempOldestMsgQueueWCLator_FromMemType.addr<<endl;
                 // The request finished its last stage
                 latency = 1;
               }
               else {
+                cout<<"Latency Est. 8 for ID "<<tempOldestMsgQueueWCLator_FromMemType.msgId<<"  Addr  "<<tempOldestMsgQueueWCLator_FromMemType.addr<<endl;
                 // The request did not proceed into any stages
                 latency = B_1 + B_2 + B_3 + m_reqclks + m_sharedcachelatency + m_respclks + (k_a) * max(m_reqclks,max(m_sharedcachelatency,m_respclks))
                     + (k_b + k_d + k_e) * (m_reqclks + m_respclks) + k_c * max(m_sharedcachelatency,m_respclks); 
@@ -409,15 +519,18 @@ namespace ns3 {
             case 2:
               /* REQ:RESP */
               if(tempOldestMsgQueueWCLator_FromMemType.currStage == "REQ") {
+                cout<<"Latency Est. 9 for ID "<<tempOldestMsgQueueWCLator_FromMemType.msgId<<"  Addr  "<<tempOldestMsgQueueWCLator_FromMemType.addr<<endl;;
                 // The request finished proceed REQ stage
                 latency = B_2 + B_3 + m_reqclks + m_sharedcachelatency + m_respclks + (k_a) * max(m_sharedcachelatency,m_respclks) 
                     + (k_b + k_d + k_e) * (m_respclks) + k_c * max(m_sharedcachelatency,m_respclks);
               }
               else if(tempOldestMsgQueueWCLator_FromMemType.currStage == "RESPONSE"){
+                cout<<"Latency Est. 10 for ID "<<tempOldestMsgQueueWCLator_FromMemType.msgId<<"  Addr  "<<tempOldestMsgQueueWCLator_FromMemType.addr<<endl;
                 // The request finished its last stage
                 latency = 1;
               }
               else{
+                cout<<"Latency Est. 11 for ID "<<tempOldestMsgQueueWCLator_FromMemType.msgId<<"  Addr  "<<tempOldestMsgQueueWCLator_FromMemType.addr<<endl;
                 // The request did not proceed into any stages
                 latency = B_1 + B_2 + B_3 + m_reqclks + m_sharedcachelatency + m_respclks + (k_a) * max(m_reqclks,max(m_sharedcachelatency,m_respclks))
                     + (k_b + k_d + k_e) * (m_reqclks + m_respclks) + k_c * max(m_sharedcachelatency,m_respclks); 
@@ -428,7 +541,14 @@ namespace ns3 {
               break;
             }
           }
-          if(logWclator) cout<<"WCLator in Bank Done latency "<<latency<<endl;
+          else {
+            //cout<<"6"<<endl;
+            cout<<"order is not determined at all. let s give it a hard time"<<endl;
+            latency  = 0 ;
+          }
+
+          cout<<"WCLator in Arbiter Done with Latency "<<latency<<" and the assosicate deadline is "<<tempOldestMsgQueueWCLator_FromMemType.associateDeadline<<endl;
+          //cout<<"to be added is "<<tempOldestMsgQueueWCLator.msgId<<" adress "<<tempOldestMsgQueueWCLator.addr<<"  Addr  "<<tempOldestMsgQueueWCLator_FromMemType.addr<<endl;
           // Determination
           if(latency > tempOldestMsgQueueWCLator_FromMemType.associateDeadline){
             m_GlobalQueue->m_GlobalOldestQueue.InsertElement(tempOldestMsgQueueWCLator);
@@ -436,10 +556,13 @@ namespace ns3 {
           }
           m_GlobalQueue->m_GlobalOldestQueue.InsertElement(tempOldestMsgQueueWCLator);
         }
+        
         return true;
       }    
       return true;
     }
+
+    
 
     bool SharedCacheCtrl::terminateBank(unsigned int coreID, uint64_t adr, unsigned int msg ){
       bool terminate;
