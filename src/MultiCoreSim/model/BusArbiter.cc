@@ -459,7 +459,19 @@ namespace ns3
     }
 
     
-
+    if (m_reza_log)
+      cout << "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ Global Service Queue Contains the Following ++++++++++++++++++++++++++++++++++++++++++++++++++++++" << endl;
+    if (m_reza_log)
+    {
+      for (int u = 0; u < m_GlobalQueue->m_GlobalReqFIFO.GetQueueSize(); u++)
+      {
+        BusIfFIFO::BusReqMsg tempNonOldestReqMsgTemp;
+        tempNonOldestReqMsgTemp = m_GlobalQueue->m_GlobalReqFIFO.GetFrontElement();
+        m_GlobalQueue->m_GlobalReqFIFO.PopElement();
+        cout << "AT " << u << " ADDR " << tempNonOldestReqMsgTemp.addr << "  ReqID  " << tempNonOldestReqMsgTemp.reqCoreId << "  wbID  " << tempNonOldestReqMsgTemp.wbCoreId << "  MSGID " << tempNonOldestReqMsgTemp.msgId << "  AGENT  " << tempNonOldestReqMsgTemp.sharedCacheAgent << endl;
+        m_GlobalQueue->m_GlobalReqFIFO.InsertElement(tempNonOldestReqMsgTemp);
+      }
+    }
     
     if (m_reza_log && m_GlobalQueue->m_MsgType.GetQueueSize() > 0 )
     {
@@ -473,6 +485,12 @@ namespace ns3
         m_GlobalQueue->m_MsgType.InsertElement(tempOldestReqMsgTemp_mtype);
       }
       cout<<"*************************************************************"<<endl; 
+    }
+
+    for (unsigned int i = 0; i < m_GlobalQueue->m_GlobalRRQueue.size(); i++)
+    {
+      if (m_reza_log)
+        cout << " Order is: " << m_GlobalQueue->m_GlobalRRQueue.at(i) << endl;
     }
     
 
@@ -547,38 +565,45 @@ namespace ns3
             m_GlobalQueue->m_MsgType.InsertElement(tempOldestMsgQueueWCLator_FromMemType_1);
           }
         }
-        cout<<"For ReqID "<<WCLatorReqID<<" and msgID "<<tempOldestMsgQueueWCLator.msgId<<" the RR order is "<<currentOrder<<" deadline "<<deadline<<endl;
+        cout<<"------------------------------------------------------------------------------------------------------------------------------------"<<endl;
+        cout<<"For ReqID "<<WCLatorReqID<<" and msgID "<<tempOldestMsgQueueWCLator.msgId<<" the RR order is "<<currentOrder<<" order of arbitration "<<tempOldestMsgQueueWCLator_FromMemType.orderofArbitration<<" deadline "<<deadline<<endl;
         //cout<<"3  "<<tempOldestMsgQueueWCLator_FromMemType.associateDeadline_final<<" order "<<tempOldestMsgQueueWCLator_FromMemType.orderofArbitration<<endl;
         // Extract the k_a, k_b, k_c, k_d, and k_e
         unsigned tempOrderFront;
         unsigned int GlobalQueueSize = m_GlobalQueue->m_GlobalRRQueue.size();
         for (unsigned int it8 = 0; it8 < GlobalQueueSize; it8++) {
-          if(currentOrder != m_GlobalQueue->m_GlobalRRQueue.at(it8)){           
+          if(currentOrder > it8){    
+                
             //cout<<"1 WCLator in Arbiter Done with Ka "<<k_a<<" Kb "<<k_b<<" Kc "<<k_c<<" Kd "<<k_d<<" Ke "<<k_e<<endl;
             tempOrderFront = m_GlobalQueue->m_GlobalRRQueue.at(it8);
+            cout<<"tempOrderFront  "<<tempOrderFront<<endl;   
             bool nextInMemType = false;
+            bool notDetermined = false;
             //cout<<"size of global "<<tempFromOldest.GetQueueSize()<<endl;
             for (int it9 = 0; it9 < tempFromOldest.GetQueueSize() && nextInMemType == false; it9++) {
               tempOldestMsgQueueWCLator_FromMemType_local = tempFromOldest.GetFrontElement();
               //cout<<"in the inner loopp "<<tempOldestMsgQueueWCLator_FromMemType_local.msgId<<" popped "<<endl;
               tempFromOldest.PopElement();              
-              if((tempOldestMsgQueueWCLator_FromMemType_local.msgId == 0 && tempOldestMsgQueueWCLator_FromMemType_local.wbCoreId == tempOrderFront) 
-                || (tempOldestMsgQueueWCLator_FromMemType_local.msgId != 0 && tempOldestMsgQueueWCLator_FromMemType_local.reqCoreId == tempOrderFront)) {                  
+              if(((tempOldestMsgQueueWCLator_FromMemType_local.msgId == 0 && tempOldestMsgQueueWCLator_FromMemType_local.wbCoreId == tempOrderFront) 
+                || (tempOldestMsgQueueWCLator_FromMemType_local.msgId != 0 && tempOldestMsgQueueWCLator_FromMemType_local.reqCoreId == tempOrderFront)) ) {                  
                 tempFromOldest.InsertElement(tempOldestMsgQueueWCLator_FromMemType_local);         
                 //cout<<"in the inner loopp "<<tempOldestMsgQueueWCLator_FromMemType_local.msgId<<" added back "<<endl;         
-                for(int ii2=0; ii2<m_GlobalQueue->m_MsgType.GetQueueSize() && nextInMemType == false; ii2++){               
+                for(int ii2=0; ii2<m_GlobalQueue->m_MsgType.GetQueueSize() && nextInMemType == false; ii2++) {               
                   BusIfFIFO::BusReqMsg tempMemType;
                   tempMemType = m_GlobalQueue->m_MsgType.GetFrontElement();
                   m_GlobalQueue->m_MsgType.PopElement();
-                  if(tempMemType.msgId == tempOldestMsgQueueWCLator_FromMemType_local.msgId && tempMemType.addr == tempOldestMsgQueueWCLator_FromMemType_local.addr) {
-                    // cout<<"found in the memtype  from the oldest order of arbitration "<<tempOldestMsgQueueWCLator_FromMemType.orderofArbitration<<" bank agent "<<tempOldestMsgQueueWCLator_FromMemType.sharedCacheAgent<<endl;
-                    // cout<<"found in the memtype  from the in front of order of arbitration "<<tempMemType.orderofArbitration<<" bank agent "<<tempMemType.sharedCacheAgent<<endl;
+                  if(tempOrderFront == WCLatorReqID) notDetermined = true;
+                  cout<<"found in the memtype  from the oldest order of arbitration "<<tempOldestMsgQueueWCLator_FromMemType.orderofArbitration<<" bank agent "<<tempOldestMsgQueueWCLator_FromMemType_local.sharedCacheAgent<<"  id is "<<tempOldestMsgQueueWCLator_FromMemType_local.msgId<<endl;
+                  cout<<"found in the memtype  from the in front of order of arbitration "<<tempMemType.orderofArbitration<<" bank agent "<<tempMemType.sharedCacheAgent<<"  id is "<<tempMemType.msgId<<endl;                     
+                  if(tempMemType.msgId == tempOldestMsgQueueWCLator_FromMemType_local.msgId && tempMemType.addr == tempOldestMsgQueueWCLator_FromMemType_local.addr && tempOrderFront != WCLatorReqID) {
+                    cout<<"inside"<<endl;
+                    notDetermined = true;
                     if(tempOldestMsgQueueWCLator_FromMemType.orderofArbitration == tempMemType.orderofArbitration && tempOldestMsgQueueWCLator_FromMemType.sharedCacheAgent == tempMemType.sharedCacheAgent){
                       // Extract the k_a
-                      //cout<<"Check the sharedcacheagent is known for both of these temporary request "<<tempMemType.orderofArbitration<<endl;
+                      
                       //abort();
                       k_a++;
-                      //cout<<"k_a incremented "<<k_a<<endl;
+                       cout<<"k_a incremented "<<k_a<<endl;
                       nextInMemType = true;
                     }
                     else if (tempOldestMsgQueueWCLator_FromMemType.orderofArbitration == tempMemType.orderofArbitration && tempOldestMsgQueueWCLator_FromMemType.sharedCacheAgent != tempMemType.sharedCacheAgent) {
@@ -586,7 +611,7 @@ namespace ns3
                       //cout<<"Check the sharedcacheagent is known for both of these temporary request "<<tempMemType.orderofArbitration<<endl;
                       //abort();
                       k_b++;
-                      //cout<<"k_b incremented "<<k_b<<endl;
+                      cout<<"k_b incremented "<<k_b<<endl;
                       nextInMemType = true;
                     }   
                     else if ((tempOldestMsgQueueWCLator_FromMemType.orderofArbitration == 0 && tempMemType.orderofArbitration == 1 && tempOldestMsgQueueWCLator_FromMemType.sharedCacheAgent == tempMemType.sharedCacheAgent)
@@ -595,7 +620,7 @@ namespace ns3
                       //cout<<"Check the sharedcacheagent is known for both of these temporary request "<<tempMemType.orderofArbitration<<endl;
                       //abort();
                       k_c++;
-                      //cout<<"k_c incremented "<<k_c<<endl;
+                      cout<<"k_c incremented "<<k_c<<endl;
                       nextInMemType = true;
                     }  
                     else if ((tempOldestMsgQueueWCLator_FromMemType.orderofArbitration == 0 && tempMemType.orderofArbitration == 1 && tempOldestMsgQueueWCLator_FromMemType.sharedCacheAgent != tempMemType.sharedCacheAgent)
@@ -604,7 +629,7 @@ namespace ns3
                       //cout<<"Check the sharedcacheagent is known for both of these temporary request "<<tempMemType.orderofArbitration<<endl;
                       //abort();
                       k_d++;
-                      //cout<<"k_d incremented "<<k_d<<endl;
+                      cout<<"k_d incremented "<<k_d<<endl;
                       nextInMemType = true;
                     }  
                     else if ((tempOldestMsgQueueWCLator_FromMemType.orderofArbitration == 0 && tempMemType.orderofArbitration == 3) || (tempOldestMsgQueueWCLator_FromMemType.orderofArbitration == 3 && tempMemType.orderofArbitration == 0)){
@@ -612,7 +637,7 @@ namespace ns3
                       //cout<<"Check the sharedcacheagent is known for both of these temporary request  "<<tempMemType.orderofArbitration<<endl;
                       //abort();
                       k_e++;
-                      //cout<<"k_e incremented "<<k_e<<endl;
+                      cout<<"k_e incremented "<<k_e<<endl;
                       nextInMemType = true;
                     }
                     //cout<<"2- WCLator in Arbiter Done with Ka "<<k_a<<" Kb "<<k_b<<" Kc "<<k_c<<" Kd "<<k_d<<" Ke "<<k_e<<endl;                
@@ -620,6 +645,12 @@ namespace ns3
                   }
                   else{
                     m_GlobalQueue->m_MsgType.InsertElement(tempMemType);
+                  }
+                  /** here it means that we went over the queue of MemType but we could not find the oldest request meaning that it is not determined yet. 
+                   * hence, we need to consider the worst possible case until it can be determined **/                  
+                  if((ii2 == (m_GlobalQueue->m_MsgType.GetQueueSize()-1)) && notDetermined == false) {
+                    cout<<"the request oldest id "<<tempOldestMsgQueueWCLator_FromMemType_local.msgId<<" is not determined yet hence adding one to kc to resemble the worst case "<<endl;
+                    k_c++;
                   }
                 }
               }
@@ -634,7 +665,7 @@ namespace ns3
         
         cout<<"Final WCLator in Arbiter Done with Ka "<<k_a<<" Kb "<<k_b<<" Kc "<<k_c<<" Kd "<<k_d<<" Ke "<<k_e<<endl;
 
-        
+
 
 
 
@@ -2354,25 +2385,13 @@ namespace ns3
   {
     //cout<<"In ReqFncCall"<<endl;
     if(m_duetto){
-      /**** Logic to determine the arbiter****/ 
-      if(WCLator()){
-        if(m_reza_log) cout<<"----------------------------------------------------------------------------------------------------------------------------------------------   REQ Arbiter  FCFS Mode"<<endl;   
-        if(arb_req_mode == "RT") {
-          m_PndReq = false;
-          cout<<"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  switch from RT to HP  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"<<endl;
-        }
-        arb_req_mode = "HP"; 
-        MSI_FcFsReqBus();
-      }
-      else {
-        if(m_reza_log) cout<<"----------------------------------------------------------------------------------------------------------------------------------------------  REQ Arbiter RT Mode "<<endl;
-        if(arb_req_mode == "HP"){
-          m_PndReq = false;
-          cout<<"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  switch from HP to RT  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"<<endl;
-        } 
-        arb_req_mode = "RT"; 
+      /**** Logic to determine the arbiter****/             
+      if(arb_req_mode == "RT") {
         RR_RT_ReqBus();
       }
+      else if (arb_req_mode == "HP") { 
+        MSI_FcFsReqBus();
+      }          
     }
     else {
       if (m_bus_arb == BusARBType::UNIFIED_TDM_ARB)
@@ -2421,24 +2440,13 @@ namespace ns3
     //cout<<"In RespFncCall"<<endl;
 
     if(m_duetto){
-      /**** Logic to determine the arbiter****/ 
-      if(WCLator()) {
-        if(m_reza_log) cout<<"---------------------------------------------------------------------------------------------------------------------------------------------- RESP Arbiter HP Mode"<<endl;   
-        if(arb_resp_mode == "RT") {
-          cout<<"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  switch from RT to HP  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%";
-        }
-
-        arb_resp_mode = "HP";
+      /**** Logic to determine the arbiter****/   
+      if(arb_resp_mode == "RT") {
+        RR_RT_RespBus();      
+      }
+      else if(arb_resp_mode == "HP") {
         MSI_FcFsRespBus();      
-      }
-      else {
-        if(m_reza_log) cout<<"---------------------------------------------------------------------------------------------------------------------------------------------- RESP Arbiter RT Mode "<<endl;   
-        if(arb_resp_mode == "HP") {
-          cout<<"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  switch from HP to RT  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"<<endl;
-        }
-        arb_resp_mode = "RT";
-        RR_RT_RespBus();
-      }
+      } 
     }
     else {
       if (m_bus_arb == BusARBType::UNIFIED_TDM_ARB)
@@ -2549,11 +2557,54 @@ namespace ns3
   {
     busArbiter->deadlineProgress();
     busArbiter->CycleAdvance();
+    if (busArbiter->m_duetto)
+    {
+      /**** Logic to determine the arbiter****/
+      if (busArbiter->WCLator())
+      {
+          if (busArbiter->m_reza_log)
+              cout << "---------------------------------------------------------------------------------------------------------------------------------------------- REQ Arbiter HP Mode" << endl;
+          if (busArbiter->arb_req_mode == "RT")
+          {
+              busArbiter->m_PndReq = false;
+              cout << "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  switch from RT to HP  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%" << endl;
+          }
+          busArbiter->arb_req_mode = "HP";
+          if (busArbiter->m_reza_log)
+              cout << "---------------------------------------------------------------------------------------------------------------------------------------------- RESP Arbiter HP Mode" << endl;
+          if (busArbiter->arb_resp_mode == "RT")
+          {
+              cout << "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  switch from RT to HP  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%";
+          }
+          busArbiter->arb_resp_mode = "HP";
+      }
+      else
+      {
+          if (busArbiter->m_reza_log)
+              cout << "----------------------------------------------------------------------------------------------------------------------------------------------  REQ Arbiter RT Mode " << endl;
+          if (busArbiter->arb_req_mode == "HP")
+          {
+              busArbiter->m_PndReq = false;
+              cout << "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  switch from HP to RT  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%" << endl;
+          }
+          busArbiter->arb_req_mode = "RT";
+
+          if (busArbiter->m_reza_log)
+              cout << "---------------------------------------------------------------------------------------------------------------------------------------------- RESP Arbiter RT Mode " << endl;
+          if (busArbiter->arb_resp_mode == "HP")
+          {
+              cout << "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  switch from HP to RT  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%" << endl;
+          }
+          busArbiter->arb_resp_mode = "RT";
+      }
+    }
+
   }
   //^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^REWIEWD^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^//
   void BusArbiter::CycleAdvance()
   {
-    //cout<<"In BusArbiter::CycleAdvance"<<endl;
+    cout << "In BusArbiter::CycleAdvance   " << m_arbiCycle << endl;
+    
     if (m_stallDetectionEnable)
     {
       m_stall_cnt = (m_PndReq) ? 0 : (m_stall_cnt + 1);
