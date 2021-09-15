@@ -215,6 +215,8 @@ namespace ns3 {
     GenericFIFO <BusReqMsg  > m_rxMsgFIFO;
     GenericFIFO <BusRespMsg > m_rxRespFIFO;
 
+    GenericFIFO <BusRespMsg> m_localPendingRespTxBuffer;
+
     int m_fifo_id;
 
     void SetFIFOId (int fifo_id) {

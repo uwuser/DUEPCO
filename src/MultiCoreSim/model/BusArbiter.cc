@@ -41,7 +41,7 @@ namespace ns3
     m_reqCoreCnt = 0;
     m_respCoreCnt = 0;
     m_logFileGenEnable = 0;
-    m_cacheBlkSize = 64;
+    m_cacheBlkSize = 64;    
     m_sharedCacheBusIfFIFO = assoicateLLCBusIfFIFO;
     m_busIfFIFO = associatedPrivCacheBusIfFIFO;
     m_interConnectFIFO = interConnectFIFO;
@@ -88,6 +88,7 @@ namespace ns3
   {
     m_dt = dt; // dt is cpuClkPeriod
   }
+
   //^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^REWIEWD^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^//
   int BusArbiter::GetDt()
   {
@@ -141,6 +142,12 @@ namespace ns3
   {
     m_cpuCore = nPrivCores; // since we have the same amount of cores as private caches
   }
+
+  uint32_t BusArbiter::retrieveSharedBankCacheLine (uint64_t phy_addr) {          
+    uint32_t cacheLine; 
+    cacheLine = (phy_addr >> (int) log2(m_cacheBlkSize)) & (m_nsets-1);  
+    return cacheLine;
+  }
   //^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^REWIEWD^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^//
   unsigned BusArbiter::createMask(unsigned a, unsigned b)
   {
@@ -150,7 +157,9 @@ namespace ns3
     return r;
   }
   //^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^REWIEWD^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^//
-
+  void BusArbiter::SetCacheNsets (uint32_t nsets) {
+    m_nsets = nsets;
+  }
   void BusArbiter::SetSharedCacheLatency (uint32_t latency)  {    // Modified to Accomodate Multi Shared Cache
     m_sharedbankclks = latency;                                    // Modified to Accomodate Multi Shared Cache
   }  
@@ -495,7 +504,7 @@ namespace ns3
     
 
 
-    unsigned int deadline, latency, WCLatorReqID, currentOrder;
+    unsigned int latency, addedLatency, WCLatorReqID, currentOrder;
     unsigned int B_1, B_2, B_3;
     unsigned int k_a, k_b, k_c, k_d, k_e;    
 
@@ -505,7 +514,7 @@ namespace ns3
 
     ns3::GenericFIFO<ns3::BusIfFIFO::BusReqMsg> tempFromOldest;
     tempFromOldest = m_GlobalQueue->m_GlobalOldestQueue;
-
+    unsigned int deadline;
     if(!m_GlobalQueue->m_GlobalOldestQueue.IsEmpty()){    
       for (int it5 = 0; it5 < m_GlobalQueue->m_GlobalOldestQueue.GetQueueSize(); it5++) {      
         currentOrder = 100;
@@ -530,6 +539,7 @@ namespace ns3
         tempOldestMsgQueueWCLator_FromMemType_local.associateDeadline_final = false;
         tempOldestMsgQueueWCLator = m_GlobalQueue->m_GlobalOldestQueue.GetFrontElement();
         m_GlobalQueue->m_GlobalOldestQueue.PopElement();
+
         WCLatorReqID = tempOldestMsgQueueWCLator.msgId == 0 ? tempOldestMsgQueueWCLator.wbCoreId : tempOldestMsgQueueWCLator.reqCoreId;        
 
         bool RR_Con = false;
@@ -563,7 +573,7 @@ namespace ns3
           }
         }
 
-        
+        cout<<"For ReqID "<<WCLatorReqID<<" and msgID "<<tempOldestMsgQueueWCLator.msgId<<" the RR order is "<<currentOrder<<" order of arbitration "<<tempOldestMsgQueueWCLator_FromMemType.orderofArbitration<<" deadline "<<deadline<<endl;
         
         // Extract the k_a, k_b, k_c, k_d, and k_e
         unsigned tempOrderFront;
@@ -663,19 +673,118 @@ namespace ns3
         }
         
         cout<<"Final WCLator in Arbiter Done with Ka "<<k_a<<" Kb "<<k_b<<" Kc "<<k_c<<" Kd "<<k_d<<" Ke "<<k_e<<endl;
-        latency = 0;
+        
         // check if HP can do something that adds to the latency - This can be any oldest that is lower priority or any non oldest from anyone
-
+        addedLatency = 0;
         if(tempOldestMsgQueueWCLator_FromMemType.orderDetermined){
           switch (tempOldestMsgQueueWCLator_FromMemType.orderofArbitration)
           {          
           case 0:
             /* REQ:BANK:RESPONSE */            
             if(tempOldestMsgQueueWCLator_FromMemType.currStage == "REQ") {            
-              // check if there is anything that HPA can send on same BANK from lower priority      
-            }
+              // check if there is anything that HPA can process on same BANK from RxResp from lower priority      
+              for (std::list<Ptr<BusIfFIFO>>::iterator it13 = m_sharedCacheBusIfFIFO.begin(); it13 != m_sharedCacheBusIfFIFO.end(); it13++)
+              {
+                if ((*it13)->m_rxRespFIFO.IsEmpty() == false)
+                {
+                  // if there is any response from lower priority oldest Or from any priority non oldest, we need to add to the latency
+                  ns3::BusIfFIFO::BusRespMsg RxResp_HP;
+                  RxResp_HP = (*it13)->m_rxRespFIFO.GetFrontElement();
+                  if (RxResp_HP.msgId != 0 && isOldest(RxResp_HP.addr,RxResp_HP.reqCoreId)) {
+                    if((tempOldestMsgQueueWCLator_FromMemType.msgId != 0 &&  isHigherPrio(tempOldestMsgQueueWCLator_FromMemType.reqCoreId, RxResp_HP.reqCoreId) == true) ||
+                       (tempOldestMsgQueueWCLator_FromMemType.msgId == 0 &&  isHigherPrio(tempOldestMsgQueueWCLator_FromMemType.wbCoreId, RxResp_HP.reqCoreId) == true)){
+                      addedLatency =  m_sharedbankclks;
+                    }
+                  }
+                  else if(RxResp_HP.msgId == 0 && isOldest(RxResp_HP.addr,RxResp_HP.respCoreId)){
+                    if((tempOldestMsgQueueWCLator_FromMemType.msgId != 0 &&  isHigherPrio(tempOldestMsgQueueWCLator_FromMemType.reqCoreId, RxResp_HP.respCoreId) == true) ||
+                       (tempOldestMsgQueueWCLator_FromMemType.msgId == 0 &&  isHigherPrio(tempOldestMsgQueueWCLator_FromMemType.wbCoreId, RxResp_HP.respCoreId) == true)){
+                      addedLatency =  m_sharedbankclks;
+                    }
+                  }
+                  else {
+                    addedLatency =  m_sharedbankclks;
+                  }                  
+                }                
+              } 
+              // check if there is anything that HPA can process on same BANK from m_localPendingRespTxBuffer from lower priority
+              for (std::list<Ptr<BusIfFIFO>>::iterator it13 = m_sharedCacheBusIfFIFO.begin(); it13 != m_sharedCacheBusIfFIFO.end(); it13++)
+              {
+                if ((*it13)->m_localPendingRespTxBuffer.IsEmpty() == false)
+                {
+                  // if there is any response from lower priority oldest Or from any priority non oldest, we need to add to the latency
+                  ns3::BusIfFIFO::BusRespMsg Txlocal_HP;
+                  Txlocal_HP = (*it13)->m_localPendingRespTxBuffer.GetFrontElement();
+                  if (Txlocal_HP.msgId != 0 && isOldest(Txlocal_HP.addr,Txlocal_HP.reqCoreId)) {
+                    if((tempOldestMsgQueueWCLator_FromMemType.msgId != 0 &&  isHigherPrio(tempOldestMsgQueueWCLator_FromMemType.reqCoreId, Txlocal_HP.reqCoreId) == true) ||
+                       (tempOldestMsgQueueWCLator_FromMemType.msgId == 0 &&  isHigherPrio(tempOldestMsgQueueWCLator_FromMemType.wbCoreId, Txlocal_HP.reqCoreId) == true)){
+                      addedLatency =  m_sharedbankclks;
+                    }
+                  }
+                  else if(Txlocal_HP.msgId == 0 && isOldest(Txlocal_HP.addr,Txlocal_HP.respCoreId)){
+                    if((tempOldestMsgQueueWCLator_FromMemType.msgId != 0 &&  isHigherPrio(tempOldestMsgQueueWCLator_FromMemType.reqCoreId, Txlocal_HP.respCoreId) == true) ||
+                       (tempOldestMsgQueueWCLator_FromMemType.msgId == 0 &&  isHigherPrio(tempOldestMsgQueueWCLator_FromMemType.wbCoreId, Txlocal_HP.respCoreId) == true)){
+                      addedLatency =  m_sharedbankclks;
+                    }
+                  }
+                  else {
+                    addedLatency =  m_sharedbankclks;
+                  }                  
+                }
+                
+              }   
+            }            
             else if(tempOldestMsgQueueWCLator_FromMemType.currStage == "BANK"){
-              // check if there is anything that HPA can send on RESPONSE bus from lower priority
+              // check if there is anything that HPA can send on RESPONSE bus from lower priority cores
+              for (std::list<Ptr<BusIfFIFO>>::iterator it13 = m_busIfFIFO.begin(); it13 != m_busIfFIFO.end(); it13++)
+              {
+                if ((*it13)->m_txRespFIFO.IsEmpty() == false)
+                {
+                  // if there is any response from lower priority oldest Or from any priority non oldest, we need to add to the latency
+                  ns3::BusIfFIFO::BusRespMsg txResp_HP;
+                  txResp_HP = (*it13)->m_txRespFIFO.GetFrontElement();
+                  if (txResp_HP.msgId != 0 && isOldest(txResp_HP.addr,txResp_HP.reqCoreId)) {
+                    if((tempOldestMsgQueueWCLator_FromMemType.msgId != 0 &&  isHigherPrio(tempOldestMsgQueueWCLator_FromMemType.reqCoreId, txResp_HP.reqCoreId) == true) ||
+                       (tempOldestMsgQueueWCLator_FromMemType.msgId == 0 &&  isHigherPrio(tempOldestMsgQueueWCLator_FromMemType.wbCoreId, txResp_HP.reqCoreId) == true)){
+                      addedLatency =  m_respclks;
+                    }
+                  }
+                  else if(txResp_HP.msgId == 0 && isOldest(txResp_HP.addr,txResp_HP.respCoreId)){
+                    if((tempOldestMsgQueueWCLator_FromMemType.msgId != 0 &&  isHigherPrio(tempOldestMsgQueueWCLator_FromMemType.reqCoreId, txResp_HP.respCoreId) == true) ||
+                       (tempOldestMsgQueueWCLator_FromMemType.msgId == 0 &&  isHigherPrio(tempOldestMsgQueueWCLator_FromMemType.wbCoreId, txResp_HP.respCoreId) == true)){
+                      addedLatency =  m_respclks;
+                    }
+                  }
+                  else{
+                    addedLatency =  m_respclks;
+                  }                  
+                }                
+              } 
+              // check if there is anything that HPA can send on RESPONSE bus from shared banks
+              for (std::list<Ptr<BusIfFIFO>>::iterator it13 = m_sharedCacheBusIfFIFO.begin(); it13 != m_sharedCacheBusIfFIFO.end(); it13++)
+              {
+                if ((*it13)->m_txRespFIFO.IsEmpty() == false)
+                {
+                  // if there is any response from lower priority oldest Or from any priority non oldest, we need to add to the latency
+                  ns3::BusIfFIFO::BusRespMsg txResp_HP;
+                  txResp_HP = (*it13)->m_txRespFIFO.GetFrontElement();
+                  if (txResp_HP.msgId != 0 && isOldest(txResp_HP.addr,txResp_HP.reqCoreId)) {
+                    if((tempOldestMsgQueueWCLator_FromMemType.msgId != 0 && isHigherPrio(tempOldestMsgQueueWCLator_FromMemType.reqCoreId, txResp_HP.reqCoreId) == true) ||
+                       (tempOldestMsgQueueWCLator_FromMemType.msgId == 0 && isHigherPrio(tempOldestMsgQueueWCLator_FromMemType.wbCoreId, txResp_HP.reqCoreId) == true)) {
+                      addedLatency =  m_respclks;
+                    }
+                  }
+                  else if(txResp_HP.msgId == 0 && isOldest(txResp_HP.addr,txResp_HP.respCoreId)){
+                    if((tempOldestMsgQueueWCLator_FromMemType.msgId != 0 && isHigherPrio(tempOldestMsgQueueWCLator_FromMemType.reqCoreId, txResp_HP.respCoreId) == true) ||
+                       (tempOldestMsgQueueWCLator_FromMemType.msgId == 0 && isHigherPrio(tempOldestMsgQueueWCLator_FromMemType.wbCoreId, txResp_HP.respCoreId) == true)) {
+                      addedLatency =  m_respclks;
+                    }
+                  }
+                  else{
+                    addedLatency =  m_respclks;
+                  }                  
+                }                
+              } 
             }
             else if(tempOldestMsgQueueWCLator_FromMemType.currStage == "RESPONSE"){
               // no effect?
@@ -684,10 +793,109 @@ namespace ns3
           case 1:
             /* REQ:RESPONSE:BANK */
             if(tempOldestMsgQueueWCLator_FromMemType.currStage == "REQ") {
-              // check if there is anything that HPA can send on RESPONSE bus from lower priority
+              // check if there is anything that HPA can send on RESPONSE bus from lower priority cores
+              for (std::list<Ptr<BusIfFIFO>>::iterator it13 = m_busIfFIFO.begin(); it13 != m_busIfFIFO.end(); it13++)
+              {
+                if ((*it13)->m_txRespFIFO.IsEmpty() == false)
+                {
+                  // if there is any response from lower priority oldest Or from any priority non oldest, we need to add to the latency
+                  ns3::BusIfFIFO::BusRespMsg txResp_HP;
+                  txResp_HP = (*it13)->m_txRespFIFO.GetFrontElement();
+                  if (txResp_HP.msgId != 0 && isOldest(txResp_HP.addr,txResp_HP.reqCoreId)) {
+                    if((tempOldestMsgQueueWCLator_FromMemType.msgId != 0 && isHigherPrio(tempOldestMsgQueueWCLator_FromMemType.reqCoreId, txResp_HP.reqCoreId) == true) ||
+                       (tempOldestMsgQueueWCLator_FromMemType.msgId == 0 && isHigherPrio(tempOldestMsgQueueWCLator_FromMemType.wbCoreId, txResp_HP.reqCoreId) == true))  {
+                      addedLatency =  m_respclks;
+                    }
+                  }
+                  else if(txResp_HP.msgId == 0 && isOldest(txResp_HP.addr,txResp_HP.respCoreId)){
+                    if((tempOldestMsgQueueWCLator_FromMemType.msgId != 0 && isHigherPrio(tempOldestMsgQueueWCLator_FromMemType.reqCoreId, txResp_HP.respCoreId) == true) ||
+                       (tempOldestMsgQueueWCLator_FromMemType.msgId == 0 && isHigherPrio(tempOldestMsgQueueWCLator_FromMemType.wbCoreId, txResp_HP.respCoreId) == true))  {
+                      addedLatency =  m_respclks;
+                    }
+                  }
+                  else{
+                    addedLatency =  m_respclks;
+                  }                  
+                }                
+              } 
+              // check if there is anything that HPA can send on RESPONSE bus from shared banks
+              for (std::list<Ptr<BusIfFIFO>>::iterator it13 = m_sharedCacheBusIfFIFO.begin(); it13 != m_sharedCacheBusIfFIFO.end(); it13++)
+              {
+                if ((*it13)->m_txRespFIFO.IsEmpty() == false)
+                {
+                  // if there is any response from lower priority oldest Or from any priority non oldest, we need to add to the latency
+                  ns3::BusIfFIFO::BusRespMsg txResp_HP;
+                  txResp_HP = (*it13)->m_txRespFIFO.GetFrontElement();
+                  if (txResp_HP.msgId != 0 && isOldest(txResp_HP.addr,txResp_HP.reqCoreId)) {
+                    if((tempOldestMsgQueueWCLator_FromMemType.msgId == 0 && isHigherPrio(tempOldestMsgQueueWCLator_FromMemType.wbCoreId, txResp_HP.reqCoreId) == true) ||
+                       (tempOldestMsgQueueWCLator_FromMemType.msgId != 0 && isHigherPrio(tempOldestMsgQueueWCLator_FromMemType.reqCoreId, txResp_HP.reqCoreId) == true)) {
+                      addedLatency =  m_respclks;
+                    }
+                  }
+                  else if(txResp_HP.msgId == 0 && isOldest(txResp_HP.addr,txResp_HP.respCoreId)){
+                    if((tempOldestMsgQueueWCLator_FromMemType.msgId == 0 && isHigherPrio(tempOldestMsgQueueWCLator_FromMemType.wbCoreId, txResp_HP.respCoreId) == true) ||
+                       (tempOldestMsgQueueWCLator_FromMemType.msgId != 0 && isHigherPrio(tempOldestMsgQueueWCLator_FromMemType.reqCoreId, txResp_HP.respCoreId) == true)) {
+                      addedLatency =  m_respclks;
+                    }
+                  }
+                  else{
+                    addedLatency =  m_respclks;
+                  }                  
+                }                
+              }
             }
             else if(tempOldestMsgQueueWCLator_FromMemType.currStage == "RESPONSE"){
-              // check if there is anything that HPA can send on same BANK from lower priority
+              // check if there is anything that HPA can process on same BANK from RxResp from lower priority      
+              for (std::list<Ptr<BusIfFIFO>>::iterator it13 = m_sharedCacheBusIfFIFO.begin(); it13 != m_sharedCacheBusIfFIFO.end(); it13++)
+              {
+                if ((*it13)->m_rxRespFIFO.IsEmpty() == false)
+                {
+                  // if there is any response from lower priority oldest Or from any priority non oldest, we need to add to the latency
+                  ns3::BusIfFIFO::BusRespMsg RxResp_HP;
+                  RxResp_HP = (*it13)->m_rxRespFIFO.GetFrontElement();
+                  if (RxResp_HP.msgId != 0 && isOldest(RxResp_HP.addr,RxResp_HP.reqCoreId)) {
+                    if((tempOldestMsgQueueWCLator_FromMemType.msgId == 0 &&  isHigherPrio(tempOldestMsgQueueWCLator_FromMemType.wbCoreId, RxResp_HP.reqCoreId) == true) ||
+                       (tempOldestMsgQueueWCLator_FromMemType.msgId != 0 &&  isHigherPrio(tempOldestMsgQueueWCLator_FromMemType.reqCoreId, RxResp_HP.reqCoreId) == true)) {
+                      addedLatency =  m_sharedbankclks;
+                    }
+                  }
+                  else if(RxResp_HP.msgId == 0 && isOldest(RxResp_HP.addr,RxResp_HP.respCoreId)){
+                    if((tempOldestMsgQueueWCLator_FromMemType.msgId == 0 &&  isHigherPrio(tempOldestMsgQueueWCLator_FromMemType.wbCoreId, RxResp_HP.respCoreId) == true) ||
+                       (tempOldestMsgQueueWCLator_FromMemType.msgId != 0 &&  isHigherPrio(tempOldestMsgQueueWCLator_FromMemType.reqCoreId, RxResp_HP.respCoreId) == true)) {
+                      addedLatency =  m_sharedbankclks;
+                    }
+                  }
+                  else {
+                    addedLatency =  m_sharedbankclks;
+                  }                  
+                }
+                
+              } 
+              // check if there is anything that HPA can process on same BANK from m_localPendingRespTxBuffer from lower priority
+              for (std::list<Ptr<BusIfFIFO>>::iterator it13 = m_sharedCacheBusIfFIFO.begin(); it13 != m_sharedCacheBusIfFIFO.end(); it13++)
+              {
+                if ((*it13)->m_localPendingRespTxBuffer.IsEmpty() == false)
+                {
+                  // if there is any response from lower priority oldest Or from any priority non oldest, we need to add to the latency
+                  ns3::BusIfFIFO::BusRespMsg Txlocal_HP;
+                  Txlocal_HP = (*it13)->m_localPendingRespTxBuffer.GetFrontElement();
+                  if (Txlocal_HP.msgId != 0 && isOldest(Txlocal_HP.addr,Txlocal_HP.reqCoreId)) {
+                    if((tempOldestMsgQueueWCLator_FromMemType.msgId == 0 && isHigherPrio(tempOldestMsgQueueWCLator_FromMemType.wbCoreId, Txlocal_HP.reqCoreId) == true) ||
+                       (tempOldestMsgQueueWCLator_FromMemType.msgId != 0 && isHigherPrio(tempOldestMsgQueueWCLator_FromMemType.reqCoreId, Txlocal_HP.reqCoreId) == true)){
+                      addedLatency =  m_sharedbankclks;
+                    }
+                  }
+                  else if(Txlocal_HP.msgId == 0 && isOldest(Txlocal_HP.addr,Txlocal_HP.respCoreId)){
+                    if((tempOldestMsgQueueWCLator_FromMemType.msgId == 0 && isHigherPrio(tempOldestMsgQueueWCLator_FromMemType.wbCoreId, Txlocal_HP.respCoreId) == true) ||
+                       (tempOldestMsgQueueWCLator_FromMemType.msgId != 0 && isHigherPrio(tempOldestMsgQueueWCLator_FromMemType.reqCoreId, Txlocal_HP.respCoreId) == true)){
+                      addedLatency =  m_sharedbankclks;
+                    }
+                  }
+                  else {
+                    addedLatency =  m_sharedbankclks;
+                  }                  
+                }                
+              }
             }
             else if(tempOldestMsgQueueWCLator_FromMemType.currStage == "BANK"){
               // no effect?
@@ -697,7 +905,56 @@ namespace ns3
           case 2:
             /* REQ:RESP */
             if(tempOldestMsgQueueWCLator_FromMemType.currStage == "REQ") {
-              // check if there is anything that HPA can send on RESPONSE bus from lower priority
+              // check if there is anything that HPA can send on RESPONSE bus from lower priority cores
+              for (std::list<Ptr<BusIfFIFO>>::iterator it13 = m_busIfFIFO.begin(); it13 != m_busIfFIFO.end(); it13++)
+              {
+                if ((*it13)->m_txRespFIFO.IsEmpty() == false)
+                {
+                  // if there is any response from lower priority oldest Or from any priority non oldest, we need to add to the latency
+                  ns3::BusIfFIFO::BusRespMsg txResp_HP;
+                  txResp_HP = (*it13)->m_txRespFIFO.GetFrontElement();
+                  if (txResp_HP.msgId != 0 && isOldest(txResp_HP.addr,txResp_HP.reqCoreId)) {
+                    if((tempOldestMsgQueueWCLator_FromMemType.msgId == 0 && isHigherPrio(tempOldestMsgQueueWCLator_FromMemType.wbCoreId, txResp_HP.reqCoreId) == true) ||
+                       (tempOldestMsgQueueWCLator_FromMemType.msgId != 0 && isHigherPrio(tempOldestMsgQueueWCLator_FromMemType.reqCoreId, txResp_HP.reqCoreId) == true)){
+                      addedLatency =  m_respclks;
+                    }
+                  }
+                  else if(txResp_HP.msgId == 0 && isOldest(txResp_HP.addr,txResp_HP.respCoreId)){
+                    if((tempOldestMsgQueueWCLator_FromMemType.msgId == 0 && isHigherPrio(tempOldestMsgQueueWCLator_FromMemType.wbCoreId, txResp_HP.respCoreId) == true) ||
+                       (tempOldestMsgQueueWCLator_FromMemType.msgId != 0 && isHigherPrio(tempOldestMsgQueueWCLator_FromMemType.reqCoreId, txResp_HP.respCoreId) == true)){
+                      addedLatency =  m_respclks;
+                    }
+                  }
+                  else{
+                    addedLatency =  m_respclks;
+                  }                  
+                }                
+              } 
+              // check if there is anything that HPA can send on RESPONSE bus from shared banks
+              for (std::list<Ptr<BusIfFIFO>>::iterator it13 = m_sharedCacheBusIfFIFO.begin(); it13 != m_sharedCacheBusIfFIFO.end(); it13++)
+              {
+                if ((*it13)->m_txRespFIFO.IsEmpty() == false)
+                {
+                  // if there is any response from lower priority oldest Or from any priority non oldest, we need to add to the latency
+                  ns3::BusIfFIFO::BusRespMsg txResp_HP;
+                  txResp_HP = (*it13)->m_txRespFIFO.GetFrontElement();
+                  if (txResp_HP.msgId != 0 && isOldest(txResp_HP.addr,txResp_HP.reqCoreId)) {
+                    if((tempOldestMsgQueueWCLator_FromMemType.msgId == 0 && isHigherPrio(tempOldestMsgQueueWCLator_FromMemType.wbCoreId, txResp_HP.reqCoreId) == true) ||          
+                       (tempOldestMsgQueueWCLator_FromMemType.msgId != 0 && isHigherPrio(tempOldestMsgQueueWCLator_FromMemType.reqCoreId, txResp_HP.reqCoreId) == true)) {
+                      addedLatency =  m_respclks;
+                    }
+                  }
+                  else if(txResp_HP.msgId == 0 && isOldest(txResp_HP.addr,txResp_HP.respCoreId)){
+                    if((tempOldestMsgQueueWCLator_FromMemType.msgId == 0 && isHigherPrio(tempOldestMsgQueueWCLator_FromMemType.wbCoreId, txResp_HP.respCoreId) == true) ||          
+                       (tempOldestMsgQueueWCLator_FromMemType.msgId != 0 && isHigherPrio(tempOldestMsgQueueWCLator_FromMemType.reqCoreId, txResp_HP.respCoreId) == true)) {
+                      addedLatency =  m_respclks;
+                    }
+                  }
+                  else{
+                    addedLatency =  m_respclks;
+                  }                  
+                }                
+              }
             }
             else if(tempOldestMsgQueueWCLator_FromMemType.currStage == "RESPONSE"){
               // no effect?
@@ -710,60 +967,75 @@ namespace ns3
         }
         else {
           // it is waiting for REQ
+          for (std::list<Ptr<BusIfFIFO>>::iterator it13 = m_busIfFIFO.begin(); it13 != m_busIfFIFO.end(); it13++)
+          {
+            if ((*it13)->m_txMsgFIFO.IsEmpty() == false)
+            {
+              ns3::BusIfFIFO::BusReqMsg txMsg_HP;
+              txMsg_HP = (*it13)->m_txMsgFIFO.GetFrontElement();
+              if(tempOldestMsgQueueWCLator_FromMemType.sharedCacheAgent != txMsg_HP.sharedCacheAgent) {
+                addedLatency = m_reqclks;
+              }
+              else{
+                // check if this is from the same cache line  
+                if(retrieveSharedBankCacheLine(tempOldestMsgQueueWCLator_FromMemType.addr) == retrieveSharedBankCacheLine(txMsg_HP.addr)) {
+                  k_a++;
+                  if(!m_GlobalQueue->m_GlobalOldestQueue.IsEmpty()){    
+                    BusIfFIFO::BusReqMsg PrioInversion;
+                    for (int it14 = 0; it14 < m_GlobalQueue->m_GlobalOldestQueue.GetQueueSize(); it14++) {
+                      PrioInversion = m_GlobalQueue->m_GlobalOldestQueue.GetFrontElement();
+                      m_GlobalQueue->m_GlobalOldestQueue.PopElement();
+                      if((PrioInversion.msgId == 0 && tempOldestMsgQueueWCLator_FromMemType.msgId == 0 && !isHigherPrio(PrioInversion.wbCoreId,tempOldestMsgQueueWCLator_FromMemType.wbCoreId))   ||
+                         (PrioInversion.msgId != 0 && tempOldestMsgQueueWCLator_FromMemType.msgId != 0 && !isHigherPrio(PrioInversion.reqCoreId,tempOldestMsgQueueWCLator_FromMemType.reqCoreId)) ||
+                         (PrioInversion.msgId == 0 && tempOldestMsgQueueWCLator_FromMemType.msgId != 0 && !isHigherPrio(PrioInversion.wbCoreId,tempOldestMsgQueueWCLator_FromMemType.reqCoreId))  ||
+                         (PrioInversion.msgId != 0 && tempOldestMsgQueueWCLator_FromMemType.msgId == 0 && !isHigherPrio(PrioInversion.reqCoreId,tempOldestMsgQueueWCLator_FromMemType.wbCoreId))) {
+                           m_GlobalQueue->m_GlobalOldestQueue.InsertElement(PrioInversion);
+                           k_a++;
+                        }
+                        else{
+                          m_GlobalQueue->m_GlobalOldestQueue.InsertElement(PrioInversion);
+                        }      
+                    }
+                  }
+                }
+                else {
+                  addedLatency = m_reqclks;
+                }
+              }              
+            }            
+          } 
         }
-
-
-
-        // for (std::list<Ptr<BusIfFIFO>>::iterator it13 = m_busIfFIFO.begin(); it13 != m_busIfFIFO.end(); it13++)
-        // {
-        //   if ((*it13)->m_txMsgFIFO.IsEmpty() == false)
-        //   {
-        //     ns3::BusIfFIFO::BusReqMsg txMsg_HP;
-        //     txMsg_HP = (*it13)->m_txMsgFIFO.GetFrontElement();
-        //     if ((txMsg_HP.msgId != 0 && isOldest(txMsg_HP.addr,txMsg_HP.reqCoreId) || (txMsg_HP.msgId == 0 && isOldest(txMsg_HP.addr,txMsg_HP.wbCoreId)) {
-
-        //     }
-            
-        //   }
-          
-        // } 
-
-
-        
-
-
-        // Estimate the latency   
-        
+        latency = 0;
+        // Estimate the latency           
         if((tempOldestMsgQueueWCLator_FromMemType.orderDetermined == true) && (tempOldestMsgQueueWCLator_FromMemType.associateDeadline_final==true)){
           //cout<<"4"<<endl;
           switch (tempOldestMsgQueueWCLator_FromMemType.orderofArbitration)
-          {
-            
+          {            
           case 0:
             /* REQ:BANK:RESPONSE */            
             if(tempOldestMsgQueueWCLator_FromMemType.currStage == "REQ") {
               // The request finished proceed REQ stage
               cout<<"Latency Est. 1 for ID "<<tempOldestMsgQueueWCLator_FromMemType.msgId<<"  Addr  "<<tempOldestMsgQueueWCLator_FromMemType.addr<<endl;
-              latency = B_2 + B_3 + m_sharedbankclks + m_respclks + (k_a) * max(m_sharedbankclks,m_respclks) 
+              latency = addedLatency + B_2 + B_3 + m_sharedbankclks + m_respclks + (k_a) * max(m_sharedbankclks,m_respclks) 
                   + (k_b + k_d + k_e) * (m_respclks) + k_c * max(m_sharedbankclks,m_respclks); 
                   
             }
             else if(tempOldestMsgQueueWCLator_FromMemType.currStage == "BANK"){
               cout<<"Latency Est. 2 for ID "<<tempOldestMsgQueueWCLator_FromMemType.msgId<<"  Addr  "<<tempOldestMsgQueueWCLator_FromMemType.addr<<endl;
               // The request finished its second stage
-              latency = B_3 + m_respclks + (k_a) * m_respclks 
+              latency = addedLatency + B_3 + m_respclks + (k_a) * m_respclks 
                   + (k_b + k_d + k_e) * (m_respclks) + k_c * m_respclks; 
             }
             else if(tempOldestMsgQueueWCLator_FromMemType.currStage == "RESPONSE"){
               cout<<"Latency Est. 3 for ID "<<tempOldestMsgQueueWCLator_FromMemType.msgId<<"  Addr  "<<tempOldestMsgQueueWCLator_FromMemType.addr<<endl;
               // The request finished its last stage
-              latency = 1;
+              latency = addedLatency + 1;
             }
             else {    
               cout<<"the current is "<<tempOldestMsgQueueWCLator_FromMemType.currStage<<endl;          
               cout<<"Latency Est. 4 for ID "<<tempOldestMsgQueueWCLator_FromMemType.msgId<<"  Addr  "<<tempOldestMsgQueueWCLator_FromMemType.addr<<endl;              
               abort();
-              latency = B_1 + B_2 + B_3 + m_reqclks + m_sharedbankclks + m_respclks + ((k_a) * max(m_reqclks,max(m_sharedbankclks,m_respclks))) 
+              latency = addedLatency + B_1 + B_2 + B_3 + m_reqclks + m_sharedbankclks + m_respclks + ((k_a) * max(m_reqclks,max(m_sharedbankclks,m_respclks))) 
                   + ((k_b + k_d + k_e) * (m_reqclks + m_respclks)) + (k_c * max(m_sharedbankclks,m_respclks)); 
             }
             break;
@@ -772,25 +1044,25 @@ namespace ns3
             if(tempOldestMsgQueueWCLator_FromMemType.currStage == "REQ") {
               cout<<"Latency Est. 5 for ID "<<tempOldestMsgQueueWCLator_FromMemType.msgId<<"  Addr  "<<tempOldestMsgQueueWCLator_FromMemType.addr<<endl;
               // The request finished proceed REQ stage
-              latency = B_2 + B_3 + m_sharedbankclks + m_respclks + (k_a) * max(m_sharedbankclks,m_respclks) 
+              latency = addedLatency +  B_2 + B_3 + m_sharedbankclks + m_respclks + (k_a) * max(m_sharedbankclks,m_respclks) 
                   + (k_b + k_d + k_e) * (m_respclks) + k_c * max(m_sharedbankclks,m_respclks); 
             }
             else if(tempOldestMsgQueueWCLator_FromMemType.currStage == "RESPONSE"){
               cout<<"Latency Est. 6 for ID "<<tempOldestMsgQueueWCLator_FromMemType.msgId<<"  Addr  "<<tempOldestMsgQueueWCLator_FromMemType.addr<<endl;
               // The request finished its second last stage
-              latency = B_2 + m_sharedbankclks + (k_a) * m_sharedbankclks 
+              latency = addedLatency + B_2 + m_sharedbankclks + (k_a) * m_sharedbankclks 
                    + k_c * m_sharedbankclks; 
             }
             else if(tempOldestMsgQueueWCLator_FromMemType.currStage == "BANK"){
               cout<<"Latency Est. 7 for ID "<<tempOldestMsgQueueWCLator_FromMemType.msgId<<"  Addr  "<<tempOldestMsgQueueWCLator_FromMemType.addr<<endl;
               // The request finished its last stage
-              latency = 1;
+              latency = addedLatency + 1;
             }
             else {
               cout<<"Latency Est. 8 for ID "<<tempOldestMsgQueueWCLator_FromMemType.msgId<<"  Addr  "<<tempOldestMsgQueueWCLator_FromMemType.addr<<endl;
               abort();
               // The request did not proceed into any stages
-              latency = B_1 + B_2 + B_3 + m_reqclks + m_sharedbankclks + m_respclks + (k_a) * max(m_reqclks,max(m_sharedbankclks,m_respclks))
+              latency = addedLatency + B_1 + B_2 + B_3 + m_reqclks + m_sharedbankclks + m_respclks + (k_a) * max(m_reqclks,max(m_sharedbankclks,m_respclks))
                   + (k_b + k_d + k_e) * (m_reqclks + m_respclks) + k_c * max(m_sharedbankclks,m_respclks); 
             }
             break;
@@ -799,19 +1071,19 @@ namespace ns3
             if(tempOldestMsgQueueWCLator_FromMemType.currStage == "REQ") {
               cout<<"Latency Est. 9 for ID "<<tempOldestMsgQueueWCLator_FromMemType.msgId<<"  Addr  "<<tempOldestMsgQueueWCLator_FromMemType.addr<<endl;;
               // The request finished proceed REQ stage
-              latency = B_2 + B_3 + m_reqclks + m_sharedbankclks + m_respclks + (k_a) * max(m_sharedbankclks,m_respclks) 
+              latency = addedLatency + B_2 + B_3 + m_reqclks + m_sharedbankclks + m_respclks + (k_a) * max(m_sharedbankclks,m_respclks) 
                   + (k_b + k_d + k_e) * (m_respclks) + k_c * max(m_sharedbankclks,m_respclks);
             }
             else if(tempOldestMsgQueueWCLator_FromMemType.currStage == "RESPONSE"){
               cout<<"Latency Est. 10 for ID "<<tempOldestMsgQueueWCLator_FromMemType.msgId<<"  Addr  "<<tempOldestMsgQueueWCLator_FromMemType.addr<<endl;
               // The request finished its last stage
-              latency = 1;
+              latency = addedLatency + 1;
             }
             else{
               cout<<"Latency Est. 11 for ID "<<tempOldestMsgQueueWCLator_FromMemType.msgId<<"  Addr  "<<tempOldestMsgQueueWCLator_FromMemType.addr<<endl;
               abort();
               // The request did not proceed into any stages
-              latency = B_1 + B_2 + B_3 + m_reqclks + m_sharedbankclks + m_respclks + (k_a) * max(m_reqclks,max(m_sharedbankclks,m_respclks))
+              latency = addedLatency + B_1 + B_2 + B_3 + m_reqclks + m_sharedbankclks + m_respclks + (k_a) * max(m_reqclks,max(m_sharedbankclks,m_respclks))
                   + (k_b + k_d + k_e) * (m_reqclks + m_respclks) + k_c * max(m_sharedbankclks,m_respclks); 
 
             }
@@ -2669,8 +2941,7 @@ namespace ns3
   //^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^REWIEWD^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^//
   void BusArbiter::CycleAdvance()
   {
-    cout << "In BusArbiter::CycleAdvance   " << m_arbiCycle << endl;
-    
+    cout << "In BusArbiter::CycleAdvance   " << m_arbiCycle << endl;    
     if (m_stallDetectionEnable)
     {
       m_stall_cnt = (m_PndReq) ? 0 : (m_stall_cnt + 1);

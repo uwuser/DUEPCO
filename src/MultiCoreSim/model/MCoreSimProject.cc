@@ -161,6 +161,7 @@ cout<<"----------------------------------------------------Start Setting Configu
     newsharedCacheBusIfFIFO->m_txRespFIFO.SetFifoDepth (projectXmlCfg.GetBusFIFOSize());             // Modified to Accomodate Multi Shared Cache
     newsharedCacheBusIfFIFO->m_rxMsgFIFO.SetFifoDepth  (projectXmlCfg.GetBusFIFOSize());             // Modified to Accomodate Multi Shared Cache
     newsharedCacheBusIfFIFO->m_rxRespFIFO.SetFifoDepth (projectXmlCfg.GetBusFIFOSize());             // Modified to Accomodate Multi Shared Cache
+    newsharedCacheBusIfFIFO->m_localPendingRespTxBuffer.SetFifoDepth (projectXmlCfg.GetBusFIFOSize());
     m_sharedCacheBusIfFIFO.push_back                   (newsharedCacheBusIfFIFO);
 
   /* 
@@ -180,6 +181,7 @@ cout<<"----------------------------------------------------Start Setting Configu
    double ctrlClkSkew   = ctrlClkPeriod * SharedCacheXml.GetCtrlClkSkew() / 100.00;                  // Modified to Accomodate Multi Shared Cache
    uint32_t cacheLines  = SharedCacheXml.GetCacheSize()/SharedCacheXml.GetBlockSize();               // Modified to Accomodate Multi Shared Cache
    uint32_t nsets = cacheLines/SharedCacheXml.GetNWays();                                            // Modified to Accomodate Multi Shared Cache
+   nsetshared = nsets;
    ReplcPolicy L2ReplcPolicy = ReplcPolicyDecode(SharedCacheXml.GetReplcPolicy());                   // Modified to Accomodate Multi Shared Cache    
    Ptr<SharedCacheCtrl> new_SharedCacheCtrl= CreateObject<SharedCacheCtrl> (m_busIfFIFO, cacheLines, newsharedCacheBusIfFIFO,m_sharedCacheDRAMBusIfFIFO,m_GlobalQueue);            // Modified to Accomodate Multi Shared Cache
    new_SharedCacheCtrl->SetCacheSize         (SharedCacheXml.GetCacheSize()   );                        // Modified to Accomodate Multi Shared Cache
@@ -293,7 +295,8 @@ cout<<"----------------------------------------------------Start Setting Configu
 
  /* 
   * instantiate bus arbiter
-  */
+  */  
+
    list<CacheXml>::iterator it = xmlSharedCaches.begin();                                             // Modified to Accomodate Multi Shared Cache
    CacheXml SharedCacheXml = *it;                                                                     // Modified to Accomodate Multi Shared Cache
 
@@ -307,6 +310,7 @@ cout<<"----------------------------------------------------Start Setting Configu
    m_busArbiter->SetNumRespCycles    (L1BusCnfg.GetRespBusLatcy()   );
    m_busArbiter->SetIsWorkConserv    (L1BusCnfg.GetWrkConservFlag() );
    m_busArbiter->SetIsDuetto         (L1BusCnfg.GetDuetto()         );
+   m_busArbiter->SetCacheNsets       (nsetshared                    );
    m_busArbiter->SetBusArchitecture  (L1BusCnfg.GetBusArchitecture());
    m_busArbiter->SetBusArbitration   (L1BusCnfg.GetBusArbitration() );
    m_busArbiter->SetReqBusArb        (L1BusCnfg.GetReqBusArb()      );

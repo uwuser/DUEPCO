@@ -115,6 +115,7 @@ namespace ns3 {
      // A list of Cache Ctrl Bus interface buffers
      std::list<ns3::Ptr<ns3::BusIfFIFO> > m_busIfFIFOPrivate;  // Modified to Accomodate Multi Shared Cache
 
+
      Ptr<DRAMIfFIFO> m_dramBusIfFIFO;
 
      // pointer to global queue
@@ -122,7 +123,7 @@ namespace ns3 {
     
      GenericFIFO <BusIfFIFO::BusReqMsg> m_PndWBFIFO;
 
-     GenericFIFO <BusIfFIFO::BusRespMsg> m_localPendingRespTxBuffer;
+     
      
      GenericFIFO <uint64_t> m_DRAMOutStandingExclMsg;
 
@@ -210,6 +211,8 @@ namespace ns3 {
 
   public:
     static TypeId GetTypeId(void);
+
+    
 
     SharedCacheCtrl (std::list<ns3::Ptr<ns3::BusIfFIFO> > associatedPrivCacheBusIfFIFO,
                      uint32_t       cachLines, 

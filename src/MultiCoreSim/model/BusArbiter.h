@@ -45,8 +45,10 @@ namespace ns3 {
     double   m_clkSkew; 
     uint16_t m_cpuCore;
     uint16_t m_reqclks;
+
     uint16_t m_respclks;
     uint32_t m_cacheBlkSize;
+    uint32_t m_nsets;
     bool     m_workconserv;
     bool     m_duetto;
     uint16_t m_reqCoreCnt;
@@ -139,6 +141,8 @@ namespace ns3 {
     bool removeFromOldest(uint64_t adr, unsigned int coreIndex, bool replacement);      // Modified to Accomodate Multi Shared Cache
 
     bool removeFromM_Type(uint64_t adr, unsigned int coreIndex, bool replacement);
+
+    uint32_t retrieveSharedBankCacheLine (uint64_t phy_addr);
 
     bool removeFromNonOldest(uint64_t adr, unsigned int coreIndex, bool replacement);     // Modified to Accomodate Multi Shared Cache
 
@@ -251,6 +255,8 @@ namespace ns3 {
 
     void SetNumRespCycles (int ncycle);
  
+    void SetCacheNsets (uint32_t nsets);
+
     void SetIsWorkConserv (bool workConservFlag);
 
     void SetIsDuetto(bool duetto);

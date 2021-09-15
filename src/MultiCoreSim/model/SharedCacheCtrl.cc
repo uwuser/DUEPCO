@@ -41,13 +41,13 @@ namespace ns3 {
         m_replcPolicy      = ReplcPolicy::RANDOM;
         m_logFileGenEnable = false;
         m_cache            = CreateObject<GenericCache> (cachLines);
-        m_busIfFIFOPrivate = associatedPrivCacheBusIfFIFO;
+        m_busIfFIFOPrivate = associatedPrivCacheBusIfFIFO;        
         m_busIfFIFO        = assoicateBusIfFIFO;
         m_dramBusIfFIFO    = associatedDRAMBusIfFifo;
         m_GlobalQueue      = globalQueue;
         m_ownerCoreId      = new uint16_t[cachLines];
         m_PndWBFIFO.SetFifoDepth(30);
-        m_localPendingRespTxBuffer.SetFifoDepth(30);
+        //m_localPendingRespTxBuffer.SetFifoDepth(30);
         m_DRAMOutStandingExclMsg.SetFifoDepth(30);
         m_l2CachePreloadFlag = false;
         m_dramSimEnable   = false;
@@ -357,7 +357,7 @@ namespace ns3 {
               m_GlobalQueue->m_MsgType.InsertElement(tempOldestMsgQueueWCLator_FromMemType_1);
             }
           }
-          cout<<"------------------------------------------------------------------------------------------------------------------------------------"<<endl;
+          //cout<<"------------------------------------------------------------------------------------------------------------------------------------"<<endl;
           cout<<"For ReqID "<<WCLatorReqID<<" and msgID "<<tempOldestMsgQueueWCLator.msgId<<" the RR order is "<<currentOrder<<" order of arbitration "<<tempOldestMsgQueueWCLator_FromMemType.orderofArbitration<<" deadline "<<deadline<<endl;
           //cout<<"3  "<<tempOldestMsgQueueWCLator_FromMemType.associateDeadline_final<<" order "<<tempOldestMsgQueueWCLator_FromMemType.orderofArbitration<<endl;
           // Extract the k_a, k_b, k_c, k_d, and k_e
@@ -839,6 +839,7 @@ namespace ns3 {
 
 
     SNOOPSharedRespBusEvent SharedCacheCtrl::ChkBusRxRespEvent (BusIfFIFO::BusRespMsg & busRespMsg, BusIfFIFO::BusRespMsg busRespMsg_temp) { 
+      
       if(!m_duetto) {
         if(m_reza_log_shared) cout<<"No Duetto enabled"<<endl;
         // here I implement the standalone FCFS and RT
@@ -857,9 +858,9 @@ namespace ns3 {
               }
               else {
                 if (!m_busIfFIFO->m_txRespFIFO.IsFull()) {        
-                  m_localPendingRespTxBuffer.PopElement();
+                  m_busIfFIFO->m_localPendingRespTxBuffer.PopElement();
                   m_busIfFIFO->m_txRespFIFO.InsertElement(busRespMsg_temp);              
-                  if(m_localPendingRespTxBuffer.GetQueueSize() > 0) {
+                  if(m_busIfFIFO->m_localPendingRespTxBuffer.GetQueueSize() > 0) {
                     m_sharedCacheBusy = true;
                     m_sharedcachelatencyCounter = m_sharedcachelatency;                            
                   }                  
@@ -878,9 +879,9 @@ namespace ns3 {
           }
           else if (m_txexist) {
             if (!m_busIfFIFO->m_txRespFIFO.IsFull()) {        
-              m_localPendingRespTxBuffer.PopElement();
+              m_busIfFIFO->m_localPendingRespTxBuffer.PopElement();
               m_busIfFIFO->m_txRespFIFO.InsertElement(busRespMsg_temp);              
-              if(m_localPendingRespTxBuffer.GetQueueSize() > 0) {
+              if(m_busIfFIFO->m_localPendingRespTxBuffer.GetQueueSize() > 0) {
                 m_sharedCacheBusy = true;
                 m_sharedcachelatencyCounter = m_sharedcachelatency;                            
               }                  
@@ -963,9 +964,9 @@ namespace ns3 {
               }
               else {
                 if (!m_busIfFIFO->m_txRespFIFO.IsFull()) {        
-                  m_localPendingRespTxBuffer.PopElement();
+                  m_busIfFIFO->m_localPendingRespTxBuffer.PopElement();
                   m_busIfFIFO->m_txRespFIFO.InsertElement(busRespMsg_temp);              
-                  if(m_localPendingRespTxBuffer.GetQueueSize() > 0) {
+                  if(m_busIfFIFO->m_localPendingRespTxBuffer.GetQueueSize() > 0) {
                     m_sharedCacheBusy = true;
                     m_sharedcachelatencyCounter = m_sharedcachelatency;                            
                   }                  
@@ -984,7 +985,7 @@ namespace ns3 {
           }
           else if (m_txexist) {
             if (!m_busIfFIFO->m_txRespFIFO.IsFull()) {        
-              m_localPendingRespTxBuffer.PopElement();
+              m_busIfFIFO->m_localPendingRespTxBuffer.PopElement();
 
               bool terminateii = false;
               for(int ii=0; ii<m_GlobalQueue->m_MsgType.GetQueueSize() && terminateii == false; ii++){
@@ -1001,7 +1002,7 @@ namespace ns3 {
                 }
               }               
               m_busIfFIFO->m_txRespFIFO.InsertElement(busRespMsg_temp);              
-              if(m_localPendingRespTxBuffer.GetQueueSize() > 0) {
+              if(m_busIfFIFO->m_localPendingRespTxBuffer.GetQueueSize() > 0) {
                 m_sharedCacheBusy = true;
                 m_sharedcachelatencyCounter = m_sharedcachelatency;                            
               }                  
@@ -1170,12 +1171,12 @@ namespace ns3 {
 
          //if (!m_busIfFIFO->m_txRespFIFO.IsFull()) {
          //m_busIfFIFO->m_txRespFIFO.InsertElement(wbMsg);       
-         if (!m_localPendingRespTxBuffer.IsFull()) {
-           if(m_localPendingRespTxBuffer.GetQueueSize() == 0){
+         if (!m_busIfFIFO->m_localPendingRespTxBuffer.IsFull()) {
+           if(m_busIfFIFO->m_localPendingRespTxBuffer.GetQueueSize() == 0){
              m_sharedCacheBusy = true;
              m_sharedcachelatencyCounter = m_sharedcachelatency;
            }
-           m_localPendingRespTxBuffer.InsertElement(wbMsg);
+           m_busIfFIFO->m_localPendingRespTxBuffer.InsertElement(wbMsg);
            TxRespMsgInsertFlag = true;
          }
          //}
@@ -1409,12 +1410,12 @@ namespace ns3 {
       GenericCacheMapFrmt CacheLineInfoCheck, CacheLineInfoCheckInBuffer; 
       CacheLineInfoCheck = m_cache->CpuAddrMap (busRespMsgLineCheck.addr); 
       //if(m_reza_log_shared) cout<<"Same Cache Line TX 1"<<endl;
-      if(!m_localPendingRespTxBuffer.IsEmpty()){
-        for(int iteratori_2=0; iteratori_2 < m_localPendingRespTxBuffer.GetQueueSize() && sameTX == true; iteratori_2++) { 
+      if(!m_busIfFIFO->m_localPendingRespTxBuffer.IsEmpty()){
+        for(int iteratori_2=0; iteratori_2 < m_busIfFIFO->m_localPendingRespTxBuffer.GetQueueSize() && sameTX == true; iteratori_2++) { 
          //if(m_reza_log_shared) cout<<"Same Cache Line TX 2"<<endl;
-         checkRespLineInBuffer = m_localPendingRespTxBuffer.GetFrontElement();        
+         checkRespLineInBuffer = m_busIfFIFO->m_localPendingRespTxBuffer.GetFrontElement();        
          //if(m_reza_log_shared) cout<<"Same Cache Line TX 3"<<endl;
-         m_localPendingRespTxBuffer.PopElement();
+         m_busIfFIFO->m_localPendingRespTxBuffer.PopElement();
          //if(m_reza_log_shared) cout<<"Same Cache Line TX 4"<<endl;
          if(checkRespLineInBuffer.msgId != busRespMsgLineCheck.msgId){
           //if(m_reza_log_shared) cout<<"Same Cache Line TX 5"<<endl;
@@ -1424,15 +1425,15 @@ namespace ns3 {
             //if(m_reza_log_shared) cout<<"Same Cache Line TX 7"<<endl;
             sameTX = false;
             //abort();
-            m_localPendingRespTxBuffer.InsertElement(checkRespLineInBuffer);
+            m_busIfFIFO->m_localPendingRespTxBuffer.InsertElement(checkRespLineInBuffer);
           }
           else {
             //if(m_reza_log_shared) cout<<"Same Cache Line TX 8"<<endl;
-            m_localPendingRespTxBuffer.InsertElement(checkRespLineInBuffer);
+            m_busIfFIFO->m_localPendingRespTxBuffer.InsertElement(checkRespLineInBuffer);
           }
         }
         else {
-          m_localPendingRespTxBuffer.InsertElement(checkRespLineInBuffer);
+          m_busIfFIFO->m_localPendingRespTxBuffer.InsertElement(checkRespLineInBuffer);
         }
        }
       }       
@@ -1617,8 +1618,8 @@ namespace ns3 {
            m_busIfFIFO->m_txRespFIFO.InsertElement(busResp_temp_1);
         }
       }
-      if (!m_localPendingRespTxBuffer.IsEmpty()) { 
-            if(m_reza_log_shared) cout<<"Size of the m_localPendingRespTxBuffer is "<<m_localPendingRespTxBuffer.GetQueueSize()<<" front address is "<<m_localPendingRespTxBuffer.GetFrontElement().addr<<endl;
+      if (!m_busIfFIFO->m_localPendingRespTxBuffer.IsEmpty()) { 
+            if(m_reza_log_shared) cout<<"Size of the m_localPendingRespTxBuffer is "<<m_busIfFIFO->m_localPendingRespTxBuffer.GetQueueSize()<<" front address is "<<m_busIfFIFO->m_localPendingRespTxBuffer.GetFrontElement().addr<<endl;
         
       }
       // cout<<"1------------------------------------------------------------------------------Queue size is  "<<m_busIfFIFO->m_rxMsgFIFO.GetQueueSize()<<endl;
@@ -1694,7 +1695,7 @@ namespace ns3 {
        // Process responses in the local buffer to send on the bus TXRESP
        if(!m_sharedCacheBusy){ 
         m_txexist = false;
-        if (!m_localPendingRespTxBuffer.IsEmpty()) {
+        if (!m_busIfFIFO->m_localPendingRespTxBuffer.IsEmpty()) {
           if(m_reza_log_shared) cout<<"In  SharedCacheCtrl:: Check the m_localPendingRespTxBuffer path"<<endl;          
           if(m_reza_log_shared) cout<<"there is at least one response that needs to send to the cores "<<endl;
           
@@ -1703,8 +1704,8 @@ namespace ns3 {
             for(unsigned int RR_iterator=0; RR_iterator < m_GlobalQueue->m_GlobalRRQueue.size() && !m_sharedCacheBusy ; RR_iterator++) {          
               m_reqCoreCnt = m_GlobalQueue->m_GlobalRRQueue.at(RR_iterator);
               //cout<<"m_reqCoreCnt is "<<m_reqCoreCnt<<endl;
-              for(int RR_iterator_1=0; RR_iterator_1 < m_localPendingRespTxBuffer.GetQueueSize() && !m_sharedCacheBusy ; RR_iterator_1++) {          
-                busRespMsg_temp = m_localPendingRespTxBuffer.GetFrontElement();    
+              for(int RR_iterator_1=0; RR_iterator_1 < m_busIfFIFO->m_localPendingRespTxBuffer.GetQueueSize() && !m_sharedCacheBusy ; RR_iterator_1++) {          
+                busRespMsg_temp = m_busIfFIFO->m_localPendingRespTxBuffer.GetFrontElement();    
                 if(m_reza_log_shared) cout<<"In RespShared Cache TX local buffer the recCoreID is "<<busRespMsg_temp.reqCoreId<<" and respCoreID is "<<busRespMsg_temp.respCoreId<<endl;                          
                 if(busRespMsg_temp.reqCoreId == m_reqCoreCnt) {
                   //cout<<"inside puishing to TX"<<endl;
@@ -1712,9 +1713,9 @@ namespace ns3 {
                   if (!m_busIfFIFO->m_txRespFIFO.IsFull()) {
                     if(sameCacheLineTX(busRespMsg_temp)) {
                       if(m_reza_log_shared) cout<<"In  SharedCacheCtrl:: Pushed to the TX Resp of the shared cache"<<endl;         
-                      m_localPendingRespTxBuffer.PopElement();                   
+                      m_busIfFIFO->m_localPendingRespTxBuffer.PopElement();                   
                       m_busIfFIFO->m_txRespFIFO.InsertElement(busRespMsg_temp);    
-                      if(m_localPendingRespTxBuffer.GetQueueSize() > 0) {
+                      if(m_busIfFIFO->m_localPendingRespTxBuffer.GetQueueSize() > 0) {
                         m_sharedCacheBusy = true;
                         m_sharedcachelatencyCounter = m_sharedcachelatency;                            
                       }
@@ -1725,15 +1726,15 @@ namespace ns3 {
                   }
                 }
                 else {
-                  m_localPendingRespTxBuffer.PopElement();
-                  m_localPendingRespTxBuffer.InsertElement(busRespMsg_temp);
+                  m_busIfFIFO->m_localPendingRespTxBuffer.PopElement();
+                  m_busIfFIFO->m_localPendingRespTxBuffer.InsertElement(busRespMsg_temp);
                 }
               }                      
             }
           }
           else if(!m_duetto && m_mode =="HP") {
             cout<<"Process TX FCFS"<<endl;
-            busRespMsg_temp = m_localPendingRespTxBuffer.GetFrontElement();
+            busRespMsg_temp = m_busIfFIFO->m_localPendingRespTxBuffer.GetFrontElement();
             m_txexist = true;
           }          
           else if(m_duetto){
@@ -1742,8 +1743,8 @@ namespace ns3 {
               for(unsigned int RR_iterator=0; RR_iterator < m_GlobalQueue->m_GlobalRRQueue.size() && !m_sharedCacheBusy ; RR_iterator++) {          
                 m_reqCoreCnt = m_GlobalQueue->m_GlobalRRQueue.at(RR_iterator);
                 //cout<<"m_reqCoreCnt is "<<m_reqCoreCnt<<endl;
-                for(int RR_iterator_1=0; RR_iterator_1 < m_localPendingRespTxBuffer.GetQueueSize() && !m_sharedCacheBusy ; RR_iterator_1++) {          
-                  busRespMsg_temp = m_localPendingRespTxBuffer.GetFrontElement();    
+                for(int RR_iterator_1=0; RR_iterator_1 < m_busIfFIFO->m_localPendingRespTxBuffer.GetQueueSize() && !m_sharedCacheBusy ; RR_iterator_1++) {          
+                  busRespMsg_temp = m_busIfFIFO->m_localPendingRespTxBuffer.GetFrontElement();    
                   if(m_reza_log_shared) cout<<"In RespShared Cache TX local buffer the recCoreID is "<<busRespMsg_temp.reqCoreId<<" and respCoreID is "<<busRespMsg_temp.respCoreId<<endl;                          
                   if(busRespMsg_temp.reqCoreId == m_reqCoreCnt) {
                     //cout<<"inside puishing to TX"<<endl;
@@ -1751,7 +1752,7 @@ namespace ns3 {
                     if (!m_busIfFIFO->m_txRespFIFO.IsFull()) {
                       if(sameCacheLineTX(busRespMsg_temp)) {
                         if(m_reza_log_shared) cout<<"In  SharedCacheCtrl:: Pushed to the TX Resp of the shared cache"<<endl;         
-                        m_localPendingRespTxBuffer.PopElement();
+                        m_busIfFIFO->m_localPendingRespTxBuffer.PopElement();
                         
                         bool terminatei = false;
                         for(int ii=0; ii<m_GlobalQueue->m_MsgType.GetQueueSize() && terminatei == false; ii++){
@@ -1769,7 +1770,7 @@ namespace ns3 {
                         }
                         
                         m_busIfFIFO->m_txRespFIFO.InsertElement(busRespMsg_temp);    
-                        if(m_localPendingRespTxBuffer.GetQueueSize() > 0) {
+                        if(m_busIfFIFO->m_localPendingRespTxBuffer.GetQueueSize() > 0) {
                           m_sharedCacheBusy = true;
                           m_sharedcachelatencyCounter = m_sharedcachelatency;                            
                         }
@@ -1780,15 +1781,15 @@ namespace ns3 {
                     }
                   }
                   else {
-                    m_localPendingRespTxBuffer.PopElement();
-                    m_localPendingRespTxBuffer.InsertElement(busRespMsg_temp);
+                    m_busIfFIFO->m_localPendingRespTxBuffer.PopElement();
+                    m_busIfFIFO->m_localPendingRespTxBuffer.InsertElement(busRespMsg_temp);
                   }
                 }                      
               }
             }
             if(m_mode =="HP") {              
               cout<<"Process TX Duetto FCFS"<<endl;
-              busRespMsg_temp = m_localPendingRespTxBuffer.GetFrontElement();
+              busRespMsg_temp = m_busIfFIFO->m_localPendingRespTxBuffer.GetFrontElement();
               m_txexist = true;
             }
           }
