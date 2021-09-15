@@ -326,6 +326,7 @@ namespace ns3
     m_PndResp = CheckPendingFCFSResp(m_PendResp, true);
     if (m_PndResp)
     {
+      m_GlobalQueue->m_respArbBlock = m_respclks;
       Simulator::Schedule(NanoSeconds(m_dt * m_respclks), &BusArbiter::RespStep, Ptr<BusArbiter>(this));
     }
     else
@@ -397,6 +398,7 @@ namespace ns3
     // wait one Req-TDM slot
     if (m_PndReq)
     {  
+      m_GlobalQueue->m_busArbBlock = m_reqclks;
       Simulator::Schedule(NanoSeconds(m_dt * m_reqclks), &BusArbiter::ReqStep, Ptr<BusArbiter>(this));
     }
     else
@@ -2023,8 +2025,7 @@ namespace ns3
   }
 
   void BusArbiter::RR_RT_ReqBus()
-  { 
-    
+  {     
     /*** Request Bus Arbiter for the RT Controller ***/
     if (m_reza_log)
       if (m_PndReq == true)
@@ -2189,6 +2190,7 @@ namespace ns3
     // wait one TDM Request slot, if there is any request
     if (m_PndReq)
     {
+      m_GlobalQueue->m_busArbBlock = m_reqclks;
       if (m_reza_log)
         cout << " ************************************************************************************************************************************************************In RR_RT_ReqBus a candidate is chosen to schedule" << endl;
       Simulator::Schedule(NanoSeconds(m_dt * m_reqclks), &BusArbiter::ReqStep, Ptr<BusArbiter>(this));
@@ -2676,6 +2678,7 @@ namespace ns3
     // wait Resp-TDM response slot
     if (m_PndMemResp == true)
     {
+      m_GlobalQueue->m_respArbBlock = m_respclks;
       if (m_reza_log)
         cout << "|||||||||||||||||||||||||||| RESP SCHEDULED TO SENT IN NEXT DELTA |||||||||||||||||||||||||||||||" << endl;
       Simulator::Schedule(NanoSeconds(m_dt * m_respclks), &BusArbiter::RespStep, Ptr<BusArbiter>(this));
@@ -2941,7 +2944,9 @@ namespace ns3
   //^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^REWIEWD^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^//
   void BusArbiter::CycleAdvance()
   {
-    cout << "In BusArbiter::CycleAdvance   " << m_arbiCycle << endl;    
+    cout << "In BusArbiter::CycleAdvance   " << m_arbiCycle <<" REQ Block "<<m_GlobalQueue->m_busArbBlock<<" RESPONSE Block "<<m_GlobalQueue->m_respArbBlock<< endl;        
+    if(m_GlobalQueue->m_busArbBlock > 0 ) m_GlobalQueue->m_busArbBlock--; 
+    if(m_GlobalQueue->m_respArbBlock > 0 ) m_GlobalQueue->m_respArbBlock--; 
     if (m_stallDetectionEnable)
     {
       m_stall_cnt = (m_PndReq) ? 0 : (m_stall_cnt + 1);

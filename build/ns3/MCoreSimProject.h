@@ -101,7 +101,7 @@ private:
 public:
     // Constructor
     MCoreSimProject(MCoreSimProjectXml projectXmlCfg);
-
+    uint32_t nsetshared;    
     // Starts MCore simulation
     void Start ();
 

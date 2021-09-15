@@ -248,6 +248,9 @@ namespace ns3 {
   
     unsigned int m_Core2CoreTransfer;              
     unsigned int m_SharedBankTransfer;
+
+    uint16_t m_busArbBlock;
+    uint16_t m_respArbBlock;
     
   };
 
