@@ -243,7 +243,7 @@ namespace ns3 {
     GenericDeque <BusIfFIFO::BusReqMsg> m_GlobalReqFIFO;         // Modified to Accomodate Multi Shared Cache
 
     GenericFIFO <BusIfFIFO::BusReqMsg> m_MsgType;
-
+  
     unsigned int m_Core2CoreTransfer;              
     unsigned int m_SharedBankTransfer;
     

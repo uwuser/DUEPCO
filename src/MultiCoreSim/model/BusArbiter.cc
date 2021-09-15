@@ -507,9 +507,7 @@ namespace ns3
     tempFromOldest = m_GlobalQueue->m_GlobalOldestQueue;
 
     if(!m_GlobalQueue->m_GlobalOldestQueue.IsEmpty()){    
-      //cout<<"size of oldest is "<<m_GlobalQueue->m_GlobalOldestQueue.GetQueueSize()<<endl;
-      for (int it5 = 0; it5 < m_GlobalQueue->m_GlobalOldestQueue.GetQueueSize(); it5++) {
-        //cout<<"On it5 "<<it5<<endl;
+      for (int it5 = 0; it5 < m_GlobalQueue->m_GlobalOldestQueue.GetQueueSize(); it5++) {      
         currentOrder = 100;
         WCLatorReqID = 100;
         deadline = 100;
@@ -518,19 +516,22 @@ namespace ns3
         k_c = 0;
         k_d = 0;
         k_e = 0;
-
+        
         // Retrieve the reqID
-        BusIfFIFO::BusReqMsg tempOldestMsgQueueWCLator;
-        BusIfFIFO::BusReqMsg tempOldestMsgQueueWCLator_FromMemType;
-        BusIfFIFO::BusReqMsg tempOldestMsgQueueWCLator_FromMemType_1;
-        BusIfFIFO::BusReqMsg tempOldestMsgQueueWCLator_FromMemType_local;
-
+        BusIfFIFO::BusReqMsg tempOldestMsgQueueWCLator;                   // the transaction that we are calculating the latency for
+        BusIfFIFO::BusReqMsg tempOldestMsgQueueWCLator_FromMemType;       // the transaction that we are calculating the latency for but we got from MemType
+        tempOldestMsgQueueWCLator_FromMemType.orderDetermined = false;
+        tempOldestMsgQueueWCLator_FromMemType.associateDeadline_final = false;
+        BusIfFIFO::BusReqMsg tempOldestMsgQueueWCLator_FromMemType_1;     // Just to handle the orders
+        tempOldestMsgQueueWCLator_FromMemType_1.orderDetermined = false;
+        tempOldestMsgQueueWCLator_FromMemType_1.associateDeadline_final = false;
+        BusIfFIFO::BusReqMsg tempOldestMsgQueueWCLator_FromMemType_local; // the transaction from oldest queue to check against the tua
+        tempOldestMsgQueueWCLator_FromMemType_local.orderDetermined = false;
+        tempOldestMsgQueueWCLator_FromMemType_local.associateDeadline_final = false;
         tempOldestMsgQueueWCLator = m_GlobalQueue->m_GlobalOldestQueue.GetFrontElement();
-        //cout<<"MSGID "<<tempOldestMsgQueueWCLator.msgId<<" popped "<<endl;
         m_GlobalQueue->m_GlobalOldestQueue.PopElement();
         WCLatorReqID = tempOldestMsgQueueWCLator.msgId == 0 ? tempOldestMsgQueueWCLator.wbCoreId : tempOldestMsgQueueWCLator.reqCoreId;        
-        
-        
+
         bool RR_Con = false;
         // Retrieve the RR Order
         for (unsigned int it6 = 0; it6 < m_GlobalQueue->m_GlobalRRQueue.size() && RR_Con == false; it6++) {
@@ -540,22 +541,18 @@ namespace ns3
           }
         }
         
-
         
-        //cout<<"1  "<<tempOldestMsgQueueWCLator_FromMemType.associateDeadline_final<<" order "<<tempOldestMsgQueueWCLator_FromMemType.orderofArbitration<<endl;
         // Retrieve the Deadline
-        //cout<<"1"<<endl;
         bool terminatei = false;        
-        
-        for(int ii1=0; ii1<m_GlobalQueue->m_MsgType.GetQueueSize() && terminatei == false; ii1++) {                         
-          //cout<<"2"<<endl;
+        for(int ii1=0; ii1<m_GlobalQueue->m_MsgType.GetQueueSize() && terminatei == false; ii1++) {  
+          
           //cout<<"tempOldestMsgQueueWCLator "<<tempOldestMsgQueueWCLator.msgId<<" adr "<<tempOldestMsgQueueWCLator.addr<<endl;
           //cout<<"m_GlobalQueue->m_MsgType.GetFrontElement().msgId "<<m_GlobalQueue->m_MsgType.GetFrontElement().msgId<<" adr "<<m_GlobalQueue->m_MsgType.GetFrontElement().addr<<endl;
-          if(m_GlobalQueue->m_MsgType.GetFrontElement().msgId == tempOldestMsgQueueWCLator.msgId && m_GlobalQueue->m_MsgType.GetFrontElement().addr == tempOldestMsgQueueWCLator.addr) { 
+          if(m_GlobalQueue->m_MsgType.GetFrontElement().msgId == tempOldestMsgQueueWCLator.msgId && m_GlobalQueue->m_MsgType.GetFrontElement().addr == tempOldestMsgQueueWCLator.addr
+            && m_GlobalQueue->m_MsgType.GetFrontElement().reqCoreId == tempOldestMsgQueueWCLator.reqCoreId) {   
             tempOldestMsgQueueWCLator_FromMemType = m_GlobalQueue->m_MsgType.GetFrontElement(); 
             m_GlobalQueue->m_MsgType.PopElement();           
-            deadline = tempOldestMsgQueueWCLator_FromMemType.associateDeadline;            
-            //cout<<"The deadline is "<<deadline<<endl;
+            deadline = tempOldestMsgQueueWCLator_FromMemType.associateDeadline;                      
             terminatei = true;
             m_GlobalQueue->m_MsgType.InsertElement(tempOldestMsgQueueWCLator_FromMemType);
           }
@@ -565,9 +562,9 @@ namespace ns3
             m_GlobalQueue->m_MsgType.InsertElement(tempOldestMsgQueueWCLator_FromMemType_1);
           }
         }
-        cout<<"------------------------------------------------------------------------------------------------------------------------------------"<<endl;
-        cout<<"For ReqID "<<WCLatorReqID<<" and msgID "<<tempOldestMsgQueueWCLator.msgId<<" the RR order is "<<currentOrder<<" order of arbitration "<<tempOldestMsgQueueWCLator_FromMemType.orderofArbitration<<" deadline "<<deadline<<endl;
-        //cout<<"3  "<<tempOldestMsgQueueWCLator_FromMemType.associateDeadline_final<<" order "<<tempOldestMsgQueueWCLator_FromMemType.orderofArbitration<<endl;
+
+        
+        
         // Extract the k_a, k_b, k_c, k_d, and k_e
         unsigned tempOrderFront;
         unsigned int GlobalQueueSize = m_GlobalQueue->m_GlobalRRQueue.size();
@@ -576,9 +573,11 @@ namespace ns3
                 
             //cout<<"1 WCLator in Arbiter Done with Ka "<<k_a<<" Kb "<<k_b<<" Kc "<<k_c<<" Kd "<<k_d<<" Ke "<<k_e<<endl;
             tempOrderFront = m_GlobalQueue->m_GlobalRRQueue.at(it8);
-            cout<<"tempOrderFront  "<<tempOrderFront<<endl;   
+           
             bool nextInMemType = false;
             bool notDetermined = false;
+
+         
             //cout<<"size of global "<<tempFromOldest.GetQueueSize()<<endl;
             for (int it9 = 0; it9 < tempFromOldest.GetQueueSize() && nextInMemType == false; it9++) {
               tempOldestMsgQueueWCLator_FromMemType_local = tempFromOldest.GetFrontElement();
@@ -593,10 +592,10 @@ namespace ns3
                   tempMemType = m_GlobalQueue->m_MsgType.GetFrontElement();
                   m_GlobalQueue->m_MsgType.PopElement();
                   if(tempOrderFront == WCLatorReqID) notDetermined = true;
-                  cout<<"found in the memtype  from the oldest order of arbitration "<<tempOldestMsgQueueWCLator_FromMemType.orderofArbitration<<" bank agent "<<tempOldestMsgQueueWCLator_FromMemType_local.sharedCacheAgent<<"  id is "<<tempOldestMsgQueueWCLator_FromMemType_local.msgId<<endl;
-                  cout<<"found in the memtype  from the in front of order of arbitration "<<tempMemType.orderofArbitration<<" bank agent "<<tempMemType.sharedCacheAgent<<"  id is "<<tempMemType.msgId<<endl;                     
+                  // cout<<"found in the memtype  from the oldest order of arbitration "<<tempOldestMsgQueueWCLator_FromMemType.orderofArbitration<<" bank agent "<<tempOldestMsgQueueWCLator_FromMemType_local.sharedCacheAgent<<"  id is "<<tempOldestMsgQueueWCLator_FromMemType_local.msgId<<endl;
+                  // cout<<"found in the memtype  from the in front of order of arbitration "<<tempMemType.orderofArbitration<<" bank agent "<<tempMemType.sharedCacheAgent<<"  id is "<<tempMemType.msgId<<endl;                     
                   if(tempMemType.msgId == tempOldestMsgQueueWCLator_FromMemType_local.msgId && tempMemType.addr == tempOldestMsgQueueWCLator_FromMemType_local.addr && tempOrderFront != WCLatorReqID) {
-                    cout<<"inside"<<endl;
+             
                     notDetermined = true;
                     if(tempOldestMsgQueueWCLator_FromMemType.orderofArbitration == tempMemType.orderofArbitration && tempOldestMsgQueueWCLator_FromMemType.sharedCacheAgent == tempMemType.sharedCacheAgent){
                       // Extract the k_a
@@ -664,14 +663,77 @@ namespace ns3
         }
         
         cout<<"Final WCLator in Arbiter Done with Ka "<<k_a<<" Kb "<<k_b<<" Kc "<<k_c<<" Kd "<<k_d<<" Ke "<<k_e<<endl;
-
-
-
-
-
-
-        // Estimate the latency
         latency = 0;
+        // check if HP can do something that adds to the latency - This can be any oldest that is lower priority or any non oldest from anyone
+
+        if(tempOldestMsgQueueWCLator_FromMemType.orderDetermined){
+          switch (tempOldestMsgQueueWCLator_FromMemType.orderofArbitration)
+          {          
+          case 0:
+            /* REQ:BANK:RESPONSE */            
+            if(tempOldestMsgQueueWCLator_FromMemType.currStage == "REQ") {            
+              // check if there is anything that HPA can send on same BANK from lower priority      
+            }
+            else if(tempOldestMsgQueueWCLator_FromMemType.currStage == "BANK"){
+              // check if there is anything that HPA can send on RESPONSE bus from lower priority
+            }
+            else if(tempOldestMsgQueueWCLator_FromMemType.currStage == "RESPONSE"){
+              // no effect?
+            }
+            break;
+          case 1:
+            /* REQ:RESPONSE:BANK */
+            if(tempOldestMsgQueueWCLator_FromMemType.currStage == "REQ") {
+              // check if there is anything that HPA can send on RESPONSE bus from lower priority
+            }
+            else if(tempOldestMsgQueueWCLator_FromMemType.currStage == "RESPONSE"){
+              // check if there is anything that HPA can send on same BANK from lower priority
+            }
+            else if(tempOldestMsgQueueWCLator_FromMemType.currStage == "BANK"){
+              // no effect?
+            }
+            
+            break;
+          case 2:
+            /* REQ:RESP */
+            if(tempOldestMsgQueueWCLator_FromMemType.currStage == "REQ") {
+              // check if there is anything that HPA can send on RESPONSE bus from lower priority
+            }
+            else if(tempOldestMsgQueueWCLator_FromMemType.currStage == "RESPONSE"){
+              // no effect?
+            }
+            
+            break;  
+          default:
+            break;
+          }
+        }
+        else {
+          // it is waiting for REQ
+        }
+
+
+
+        // for (std::list<Ptr<BusIfFIFO>>::iterator it13 = m_busIfFIFO.begin(); it13 != m_busIfFIFO.end(); it13++)
+        // {
+        //   if ((*it13)->m_txMsgFIFO.IsEmpty() == false)
+        //   {
+        //     ns3::BusIfFIFO::BusReqMsg txMsg_HP;
+        //     txMsg_HP = (*it13)->m_txMsgFIFO.GetFrontElement();
+        //     if ((txMsg_HP.msgId != 0 && isOldest(txMsg_HP.addr,txMsg_HP.reqCoreId) || (txMsg_HP.msgId == 0 && isOldest(txMsg_HP.addr,txMsg_HP.wbCoreId)) {
+
+        //     }
+            
+        //   }
+          
+        // } 
+
+
+        
+
+
+        // Estimate the latency   
+        
         if((tempOldestMsgQueueWCLator_FromMemType.orderDetermined == true) && (tempOldestMsgQueueWCLator_FromMemType.associateDeadline_final==true)){
           //cout<<"4"<<endl;
           switch (tempOldestMsgQueueWCLator_FromMemType.orderofArbitration)
@@ -697,8 +759,10 @@ namespace ns3
               // The request finished its last stage
               latency = 1;
             }
-            else {              
+            else {    
+              cout<<"the current is "<<tempOldestMsgQueueWCLator_FromMemType.currStage<<endl;          
               cout<<"Latency Est. 4 for ID "<<tempOldestMsgQueueWCLator_FromMemType.msgId<<"  Addr  "<<tempOldestMsgQueueWCLator_FromMemType.addr<<endl;              
+              abort();
               latency = B_1 + B_2 + B_3 + m_reqclks + m_sharedbankclks + m_respclks + ((k_a) * max(m_reqclks,max(m_sharedbankclks,m_respclks))) 
                   + ((k_b + k_d + k_e) * (m_reqclks + m_respclks)) + (k_c * max(m_sharedbankclks,m_respclks)); 
             }
@@ -724,6 +788,7 @@ namespace ns3
             }
             else {
               cout<<"Latency Est. 8 for ID "<<tempOldestMsgQueueWCLator_FromMemType.msgId<<"  Addr  "<<tempOldestMsgQueueWCLator_FromMemType.addr<<endl;
+              abort();
               // The request did not proceed into any stages
               latency = B_1 + B_2 + B_3 + m_reqclks + m_sharedbankclks + m_respclks + (k_a) * max(m_reqclks,max(m_sharedbankclks,m_respclks))
                   + (k_b + k_d + k_e) * (m_reqclks + m_respclks) + k_c * max(m_sharedbankclks,m_respclks); 
@@ -744,6 +809,7 @@ namespace ns3
             }
             else{
               cout<<"Latency Est. 11 for ID "<<tempOldestMsgQueueWCLator_FromMemType.msgId<<"  Addr  "<<tempOldestMsgQueueWCLator_FromMemType.addr<<endl;
+              abort();
               // The request did not proceed into any stages
               latency = B_1 + B_2 + B_3 + m_reqclks + m_sharedbankclks + m_respclks + (k_a) * max(m_reqclks,max(m_sharedbankclks,m_respclks))
                   + (k_b + k_d + k_e) * (m_reqclks + m_respclks) + k_c * max(m_sharedbankclks,m_respclks); 
