@@ -69,7 +69,7 @@ namespace ns3 {
      uint32_t   m_reqclks;                
      uint32_t   m_respclks;
      uint32_t   m_sharedcachelatency;     // Modified to Accomodate Multi Shared Cache
-     uint32_t   m_sharedcachelatencyCounter;     // Modified to Accomodate Multi Shared Cache
+     //uint32_t   m_sharedcachelatencyCounter;     // Modified to Accomodate Multi Shared Cache
      bool       m_sharedCacheBusy;     // Modified to Accomodate Multi Shared Cache
      uint64_t   m_Nreqs;
      uint64_t   m_Nmiss;
@@ -185,7 +185,7 @@ namespace ns3 {
      
      void CacheInitialize();
 
-     bool Bank_WCLator();
+   
      
     void CohProtocolFSMProcessing (SNOOPSharedEventType eventType, int state, SNOOPSharedOwnerState owner);
     

@@ -217,6 +217,8 @@ namespace ns3 {
 
     GenericFIFO <BusRespMsg> m_localPendingRespTxBuffer;
 
+    uint16_t m_bankArbBlock;
+     
     int m_fifo_id;
 
     void SetFIFOId (int fifo_id) {
@@ -251,6 +253,8 @@ namespace ns3 {
 
     uint16_t m_busArbBlock;
     uint16_t m_respArbBlock;
+
+    string bank_mode;
     
   };
 
