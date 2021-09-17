@@ -147,9 +147,9 @@ namespace ns3 {
       unsigned int WCL_0;
       unsigned int WCL_1;
       unsigned int WCL_2;
-      WCL_0 = 158;
-      WCL_1 = 158;
-      WCL_2 = 158; 
+      WCL_0 = 500;
+      WCL_1 = 500;
+      WCL_2 = 500; 
       if(msg.orderDetermined) {
         cout<<"determined become "<<msg.becameOldest<<endl;
         switch (msg.orderofArbitration) {

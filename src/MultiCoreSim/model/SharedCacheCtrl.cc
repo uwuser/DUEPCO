@@ -58,7 +58,7 @@ namespace ns3 {
         m_Nmiss           = 0;
         m_sharedCacheBusy = false;
         m_direction       = false;
-        m_reza_log_shared = true;
+        m_reza_log_shared = false;
         m_mode            = "HP"; 
         m_wcShared        = 0;
         
@@ -104,6 +104,7 @@ namespace ns3 {
       WCL_0 = 158;
       WCL_1 = 158;
       WCL_2 = 158;       
+      cout<<"become oldest "<<msg.becameOldest<<endl;
       if(msg.orderDetermined) {
         switch (msg.orderofArbitration) {
           case 0: 
@@ -988,12 +989,12 @@ namespace ns3 {
         // if(m_reza_log_shared) cout<<"reqID "<<tempOldestReqMsg.reqCoreId<<" wbID "<<tempOldestReqMsg.wbCoreId<<" mgID "<<tempOldestReqMsg.msgId<<endl;
         m_GlobalQueue->m_GlobalOldestQueue.PopElement();
         if(tempOldestReqMsg.addr == adr && tempOldestReqMsg.reqCoreId == coreIndex) {          
-          if(m_reza_log_shared) {
+         // if(m_reza_log_shared) {
             if(m_wcShared < m_cacheCycle - tempOldestReqMsg.becameOldest + m_sharedcachelatency)
               m_wcShared = m_cacheCycle - tempOldestReqMsg.becameOldest + m_sharedcachelatency;
              cout<<"The Oldest MsgID "<<tempOldestReqMsg.msgId<<" From "<<coreIndex<<" Terminated @ "<<m_cacheCycle<<" Arrival @ "<< tempOldestReqMsg.becameOldest <<" In the Bank: "<<m_coreId<<" Latency: "<<
                 m_cacheCycle - tempOldestReqMsg.becameOldest + m_sharedcachelatency<<" The WC is "<<m_wcShared <<endl; 
-          }
+          //}
             
           // if(m_reza_log_shared) cout<<"removeFromOldest done"<<endl;
           success = true;
@@ -1056,6 +1057,10 @@ namespace ns3 {
         }      
       }
 
+
+    
+
+
       // now it should move to the oldest queue
       if(PendingTxReq == true){
         if(m_reza_log_shared) cout<<"Adding to the queue addr "<<tempCandidate.addr<<"  reqCoreID  "<<tempCandidate.reqCoreId<<endl; 
@@ -1069,6 +1074,7 @@ namespace ns3 {
             tempitr8 = m_GlobalQueue->m_MsgType.GetFrontElement();
             m_GlobalQueue->m_MsgType.PopElement();
             if(tempitr8.msgId == tempCandidate.msgId && tempitr8.addr == tempCandidate.addr){
+              tempitr8.becameOldest = m_cacheCycle;
               assignDeadlineAfterDetermination(tempitr8);  
               m_GlobalQueue->m_MsgType.InsertElement(tempitr8);
             }
@@ -1130,7 +1136,7 @@ namespace ns3 {
         for(int itr1= 0 ; itr1 < m_busIfFIFO->m_txRespFIFO.GetQueueSize(); itr1++) {
            busResp_temp_1 = m_busIfFIFO->m_txRespFIFO.GetFrontElement();           
            m_busIfFIFO->m_txRespFIFO.PopElement();
-            if(m_reza_log_shared) cout<<"Address: "<<busResp_temp_1.addr<<" reqCoreID "<<busResp_temp_1.reqCoreId<<endl;           
+            if(m_reza_log_shared) cout<<"Address: "<<busResp_temp_1.addr<<" reqCoreID "<<busResp_temp_1.reqCoreId<<"  respCoreID  "<<busResp_temp_1.respCoreId<<"  msgID is  "<<busResp_temp_1.msgId<<endl;           
            m_busIfFIFO->m_txRespFIFO.InsertElement(busResp_temp_1);
         }
       }

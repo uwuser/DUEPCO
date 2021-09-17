@@ -219,7 +219,7 @@ namespace ns3
     if (m_reza_log) cout<<"In MSI_FcFsRespBus "<<endl;
     if (m_PndResp)
     {
-      if (m_reza_log) cout<<"In MSI_FcFsRespBus 1"<<endl;
+     if (m_reza_log) cout<<"In MSI_FcFsRespBus 1"<<endl;
      if(m_duetto) {
        if (m_reza_log) cout<<"In MSI_FcFsRespBus 2"<<endl;
         bool terminateii = false;
@@ -345,41 +345,41 @@ namespace ns3
     // insert message on the request bus
     // it takes the oldest no matter which core
     // it does not have any TDM slot so not advancing
-    if (m_reza_log)
-      cout << "-------------------------------REQ BUS ARBITER FCFS ----------------------------------" << endl;
+    // if (m_reza_log)
+    //   cout << "-------------------------------REQ BUS ARBITER FCFS ----------------------------------" << endl;
 
-    if (m_reza_log)
-      cout << "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ Global Oldest Queue Contains the Following ++++++++++++++++++++++++++++++++++++++++++++++++++++++" << endl;
-    if (m_reza_log)
-    {
-      for (int u = 0; u < m_GlobalQueue->m_GlobalOldestQueue.GetQueueSize(); u++)
-      {
-        BusIfFIFO::BusReqMsg tempOldestReqMsgTemp;
-        tempOldestReqMsgTemp = m_GlobalQueue->m_GlobalOldestQueue.GetFrontElement();
-        m_GlobalQueue->m_GlobalOldestQueue.PopElement();
-        cout << "AT " << u << " ADDR " << tempOldestReqMsgTemp.addr << "  ReqID  " << tempOldestReqMsgTemp.reqCoreId << "  wbID  " << tempOldestReqMsgTemp.wbCoreId << "  MSGID " << tempOldestReqMsgTemp.msgId << "  AGENT  " << tempOldestReqMsgTemp.sharedCacheAgent << endl;
-        m_GlobalQueue->m_GlobalOldestQueue.InsertElement(tempOldestReqMsgTemp);
-      }
-    }
-    if (m_reza_log)
-      cout << "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ Global Service Queue Contains the Following ++++++++++++++++++++++++++++++++++++++++++++++++++++++" << endl;
-    if (m_reza_log)
-    {
-      for (int u = 0; u < m_GlobalQueue->m_GlobalReqFIFO.GetQueueSize(); u++)
-      {
-        BusIfFIFO::BusReqMsg tempNonOldestReqMsgTemp;
-        tempNonOldestReqMsgTemp = m_GlobalQueue->m_GlobalReqFIFO.GetFrontElement();
-        m_GlobalQueue->m_GlobalReqFIFO.PopElement();
-        cout << "AT " << u << " ADDR " << tempNonOldestReqMsgTemp.addr << "  ReqID  " << tempNonOldestReqMsgTemp.reqCoreId << "  wbID  " << tempNonOldestReqMsgTemp.wbCoreId << "  MSGID " << tempNonOldestReqMsgTemp.msgId << "  AGENT  " << tempNonOldestReqMsgTemp.sharedCacheAgent << endl;
-        m_GlobalQueue->m_GlobalReqFIFO.InsertElement(tempNonOldestReqMsgTemp);
-      }
-    }
+    // if (m_reza_log)
+    //   cout << "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ Global Oldest Queue Contains the Following ++++++++++++++++++++++++++++++++++++++++++++++++++++++" << endl;
+    // if (m_reza_log)
+    // {
+    //   for (int u = 0; u < m_GlobalQueue->m_GlobalOldestQueue.GetQueueSize(); u++)
+    //   {
+    //     BusIfFIFO::BusReqMsg tempOldestReqMsgTemp;
+    //     tempOldestReqMsgTemp = m_GlobalQueue->m_GlobalOldestQueue.GetFrontElement();
+    //     m_GlobalQueue->m_GlobalOldestQueue.PopElement();
+    //     cout << "AT " << u << " ADDR " << tempOldestReqMsgTemp.addr << "  ReqID  " << tempOldestReqMsgTemp.reqCoreId << "  wbID  " << tempOldestReqMsgTemp.wbCoreId << "  MSGID " << tempOldestReqMsgTemp.msgId << "  AGENT  " << tempOldestReqMsgTemp.sharedCacheAgent << endl;
+    //     m_GlobalQueue->m_GlobalOldestQueue.InsertElement(tempOldestReqMsgTemp);
+    //   }
+    // }
+    // if (m_reza_log)
+    //   cout << "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ Global Service Queue Contains the Following ++++++++++++++++++++++++++++++++++++++++++++++++++++++" << endl;
+    // if (m_reza_log)
+    // {
+    //   for (int u = 0; u < m_GlobalQueue->m_GlobalReqFIFO.GetQueueSize(); u++)
+    //   {
+    //     BusIfFIFO::BusReqMsg tempNonOldestReqMsgTemp;
+    //     tempNonOldestReqMsgTemp = m_GlobalQueue->m_GlobalReqFIFO.GetFrontElement();
+    //     m_GlobalQueue->m_GlobalReqFIFO.PopElement();
+    //     cout << "AT " << u << " ADDR " << tempNonOldestReqMsgTemp.addr << "  ReqID  " << tempNonOldestReqMsgTemp.reqCoreId << "  wbID  " << tempNonOldestReqMsgTemp.wbCoreId << "  MSGID " << tempNonOldestReqMsgTemp.msgId << "  AGENT  " << tempNonOldestReqMsgTemp.sharedCacheAgent << endl;
+    //     m_GlobalQueue->m_GlobalReqFIFO.InsertElement(tempNonOldestReqMsgTemp);
+    //   }
+    // }
 
-    for (unsigned int i = 0; i < m_GlobalQueue->m_GlobalRRQueue.size(); i++)
-    {
-      if (m_reza_log)
-        cout << " Order is: " << m_GlobalQueue->m_GlobalRRQueue.at(i) << endl;
-    }
+    // for (unsigned int i = 0; i < m_GlobalQueue->m_GlobalRRQueue.size(); i++)
+    // {
+    //   if (m_reza_log)
+    //     cout << " Order is: " << m_GlobalQueue->m_GlobalRRQueue.at(i) << endl;
+    // }
     
     
 
@@ -458,8 +458,9 @@ namespace ns3
 
   bool BusArbiter::WCLator() {
     if (m_reza_log) cout<<"------------------------------------------------------WCLator in Arbiter------------------------------------------------------"<<endl;
-     if (m_reza_log && m_GlobalQueue->m_GlobalOldestQueue.GetQueueSize() >0)
-      cout << "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ Global Oldest Queue Contains the Following WCLATOR  ++++++++++++++++++++++++++++++++++++++++++++++++++++++" << endl;
+
+    if (m_reza_log && m_GlobalQueue->m_GlobalOldestQueue.GetQueueSize() >0)
+     cout << "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ Global Oldest Queue Contains the Following WCLATOR  ++++++++++++++++++++++++++++++++++++++++++++++++++++++" << endl;
     if (m_reza_log)
     {
       for (int u = 0; u < m_GlobalQueue->m_GlobalOldestQueue.GetQueueSize(); u++)
@@ -482,7 +483,8 @@ namespace ns3
         BusIfFIFO::BusReqMsg tempNonOldestReqMsgTemp;
         tempNonOldestReqMsgTemp = m_GlobalQueue->m_GlobalReqFIFO.GetFrontElement();
         m_GlobalQueue->m_GlobalReqFIFO.PopElement();
-        cout << "AT " << u << " ADDR " << tempNonOldestReqMsgTemp.addr << "  ReqID  " << tempNonOldestReqMsgTemp.reqCoreId << "  wbID  " << tempNonOldestReqMsgTemp.wbCoreId << "  MSGID " << tempNonOldestReqMsgTemp.msgId << "  AGENT  " << tempNonOldestReqMsgTemp.sharedCacheAgent << endl;
+        cout << "AT " << u << " ADDR " << tempNonOldestReqMsgTemp.addr << "  ReqID  " << tempNonOldestReqMsgTemp.reqCoreId << "  wbID  " << tempNonOldestReqMsgTemp.wbCoreId << "  MSGID " << tempNonOldestReqMsgTemp.msgId << "  AGENT  " << 
+            tempNonOldestReqMsgTemp.sharedCacheAgent << " Cache line " <<retrieveSharedBankCacheLine(tempNonOldestReqMsgTemp.addr) <<endl;
         m_GlobalQueue->m_GlobalReqFIFO.InsertElement(tempNonOldestReqMsgTemp);
       }
     }
@@ -495,7 +497,8 @@ namespace ns3
         BusIfFIFO::BusReqMsg tempOldestReqMsgTemp_mtype;
         tempOldestReqMsgTemp_mtype = m_GlobalQueue->m_MsgType.GetFrontElement();
         m_GlobalQueue->m_MsgType.PopElement();
-        cout << "AT " << u << " ADDR " << tempOldestReqMsgTemp_mtype.addr << "  ReqID  " << tempOldestReqMsgTemp_mtype.reqCoreId << "  wbID  " << tempOldestReqMsgTemp_mtype.wbCoreId << "  MSGID " << tempOldestReqMsgTemp_mtype.msgId << "  AGENT  " << tempOldestReqMsgTemp_mtype.sharedCacheAgent << " curr stage "<< tempOldestReqMsgTemp_mtype.currStage<<endl;
+        cout << "AT " << u << " ADDR " << tempOldestReqMsgTemp_mtype.addr << "  ReqID  " << tempOldestReqMsgTemp_mtype.reqCoreId << "  wbID  " << tempOldestReqMsgTemp_mtype.wbCoreId << "  MSGID " << tempOldestReqMsgTemp_mtype.msgId << "  AGENT  " <<
+             tempOldestReqMsgTemp_mtype.sharedCacheAgent << " curr stage "<< tempOldestReqMsgTemp_mtype.currStage<< " Cache line " <<retrieveSharedBankCacheLine(tempOldestReqMsgTemp_mtype.addr) <<endl;
         m_GlobalQueue->m_MsgType.InsertElement(tempOldestReqMsgTemp_mtype);
       }
       cout<<"*************************************************************"<<endl; 
@@ -544,7 +547,7 @@ namespace ns3
         tempOldestMsgQueueWCLator_FromMemType_local.associateDeadline_final = false;
 
         tempOldestMsgQueueWCLator = m_GlobalQueue->m_GlobalOldestQueue.GetFrontElement();
-        cout<<"tempOldestMsgQueueWCLator id is "<<tempOldestMsgQueueWCLator.msgId<<endl;
+        //cout<<"tempOldestMsgQueueWCLator id is "<<tempOldestMsgQueueWCLator.msgId<<endl;
         m_GlobalQueue->m_GlobalOldestQueue.PopElement();
 
         WCLatorReqID = tempOldestMsgQueueWCLator.msgId == 0 ? tempOldestMsgQueueWCLator.wbCoreId : tempOldestMsgQueueWCLator.reqCoreId;        
@@ -583,7 +586,7 @@ namespace ns3
 
        
       
-        cout<<"For ReqID "<<WCLatorReqID<<" and msgID "<<tempOldestMsgQueueWCLator.msgId<<" the RR order is "<<currentOrder<<" order of arbitration "<<tempOldestMsgQueueWCLator_FromMemType.orderofArbitration<<" deadline "<<deadline<<endl;
+        cout<<"For ReqID "<<WCLatorReqID<<" and msgID "<<tempOldestMsgQueueWCLator_FromMemType.msgId<<" the RR order is "<<currentOrder<<" order of arbitration "<<tempOldestMsgQueueWCLator_FromMemType.orderofArbitration<<" deadline "<<deadline<<endl;
         
         // Extract the k_a, k_b, k_c, k_d, and k_e
         unsigned tempOrderFront;
@@ -1558,23 +1561,7 @@ namespace ns3
                   PendingTxWBResp = true;
                   txResp = pendingWbMsg_2;
                 }
-                
-
-               
-                // if it has higher priority OR if not, older
-
-
-
-
-                //if(txResp.timestamp > pendingWbMsg_2.timestamp) {
-                  // if (ChkOnly == true)
-                  // {
-                  //   (*it4)->m_txRespFIFO.InsertElement(pendingWbMsg_2);
-                  // }
-                  // mode = 2;
-                  // PendingTxWBResp = true;
-                  // txResp = pendingWbMsg_2;
-                //}                
+                               
               }
               else
               {
@@ -2179,36 +2166,36 @@ namespace ns3
       }
     }
 
-    if (m_reza_log)
-      cout << "-------------------------------REQ BUS ARBITER 22 ----------------------------------" << endl;
+    // if (m_reza_log)
+    //   cout << "-------------------------------REQ BUS ARBITER 22 ----------------------------------" << endl;
 
-    if (m_reza_log)
-      cout << "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ Global Oldest Queue Contains the Following ++++++++++++++++++++++++++++++++++++++++++++++++++++++" << endl;
-    if (m_reza_log)
-    {
-      for (int u = 0; u < m_GlobalQueue->m_GlobalOldestQueue.GetQueueSize(); u++)
-      {
-        BusIfFIFO::BusReqMsg tempOldestReqMsgTemp;
-        tempOldestReqMsgTemp = m_GlobalQueue->m_GlobalOldestQueue.GetFrontElement();
-        m_GlobalQueue->m_GlobalOldestQueue.PopElement();
-        cout << "AT " << u << " ADDR " << tempOldestReqMsgTemp.addr << "  ReqID  " << tempOldestReqMsgTemp.reqCoreId << "  WBID  " << tempOldestReqMsgTemp.wbCoreId << "  MSGID " << tempOldestReqMsgTemp.msgId << "  AGENT  " << tempOldestReqMsgTemp.sharedCacheAgent << endl;
-        m_GlobalQueue->m_GlobalOldestQueue.InsertElement(tempOldestReqMsgTemp);
-      }
-    }
-    if (m_reza_log)
-      cout << "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ Global Service Queue Contains the Following ++++++++++++++++++++++++++++++++++++++++++++++++++++++" << endl;
-    if (m_reza_log)
-    {
-      for (int u = 0; u < m_GlobalQueue->m_GlobalReqFIFO.GetQueueSize(); u++)
-      {
-        BusIfFIFO::BusReqMsg tempNonOldestReqMsgTemp;
-        tempNonOldestReqMsgTemp = m_GlobalQueue->m_GlobalReqFIFO.GetFrontElement();
-        m_GlobalQueue->m_GlobalReqFIFO.PopElement();
-        if (m_reza_log)
-          cout << "AT " << u << " ADDR " << tempNonOldestReqMsgTemp.addr << "  ReqID  " << tempNonOldestReqMsgTemp.reqCoreId << "  WBID  " << tempNonOldestReqMsgTemp.wbCoreId << "  MSGID " << tempNonOldestReqMsgTemp.msgId << "  AGENT  " << tempNonOldestReqMsgTemp.sharedCacheAgent << endl;
-        m_GlobalQueue->m_GlobalReqFIFO.InsertElement(tempNonOldestReqMsgTemp);
-      }
-    }
+    // if (m_reza_log)
+    //   cout << "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ Global Oldest Queue Contains the Following ++++++++++++++++++++++++++++++++++++++++++++++++++++++" << endl;
+    // if (m_reza_log)
+    // {
+    //   for (int u = 0; u < m_GlobalQueue->m_GlobalOldestQueue.GetQueueSize(); u++)
+    //   {
+    //     BusIfFIFO::BusReqMsg tempOldestReqMsgTemp;
+    //     tempOldestReqMsgTemp = m_GlobalQueue->m_GlobalOldestQueue.GetFrontElement();
+    //     m_GlobalQueue->m_GlobalOldestQueue.PopElement();
+    //     cout << "AT " << u << " ADDR " << tempOldestReqMsgTemp.addr << "  ReqID  " << tempOldestReqMsgTemp.reqCoreId << "  WBID  " << tempOldestReqMsgTemp.wbCoreId << "  MSGID " << tempOldestReqMsgTemp.msgId << "  AGENT  " << tempOldestReqMsgTemp.sharedCacheAgent << endl;
+    //     m_GlobalQueue->m_GlobalOldestQueue.InsertElement(tempOldestReqMsgTemp);
+    //   }
+    // }
+    // if (m_reza_log)
+    //   cout << "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ Global Service Queue Contains the Following ++++++++++++++++++++++++++++++++++++++++++++++++++++++" << endl;
+    // if (m_reza_log)
+    // {
+    //   for (int u = 0; u < m_GlobalQueue->m_GlobalReqFIFO.GetQueueSize(); u++)
+    //   {
+    //     BusIfFIFO::BusReqMsg tempNonOldestReqMsgTemp;
+    //     tempNonOldestReqMsgTemp = m_GlobalQueue->m_GlobalReqFIFO.GetFrontElement();
+    //     m_GlobalQueue->m_GlobalReqFIFO.PopElement();
+    //     if (m_reza_log)
+    //       cout << "AT " << u << " ADDR " << tempNonOldestReqMsgTemp.addr << "  ReqID  " << tempNonOldestReqMsgTemp.reqCoreId << "  WBID  " << tempNonOldestReqMsgTemp.wbCoreId << "  MSGID " << tempNonOldestReqMsgTemp.msgId << "  AGENT  " << tempNonOldestReqMsgTemp.sharedCacheAgent << endl;
+    //     m_GlobalQueue->m_GlobalReqFIFO.InsertElement(tempNonOldestReqMsgTemp);
+    //   }
+    // }
     //cout<<" In RR_RT_ReqBus Before Scheduling the next transaction"<<endl;
     // wait one TDM Request slot, if there is any request
     if (m_PndReq)
@@ -2286,13 +2273,14 @@ namespace ns3
       if ((replacement == false && tempOldestReqMsg.addr == adr && tempOldestReqMsg.reqCoreId == coreIndex) ||
           (replacement == true && tempOldestReqMsg.addr == adr && tempOldestReqMsg.wbCoreId == coreIndex))
       {
-        if (m_reza_log){
+        //if (m_reza_log){
           if(m_wcArbiter < m_arbiCycle - tempOldestReqMsg.becameOldest)
             m_wcArbiter = m_arbiCycle - tempOldestReqMsg.becameOldest;
           cout<<"The Oldest MsgID "<<tempOldestReqMsg.msgId<<" reQID "<<coreIndex<<" wbID "<<tempOldestReqMsg.wbCoreId<<" Terminated @ "<<m_arbiCycle<<" Arrival @ "<<tempOldestReqMsg.becameOldest<<" Latency: "<<
                 m_arbiCycle - tempOldestReqMsg.becameOldest<<"  The WC is "<<m_wcArbiter<<endl; 
-        }
-        
+        //}
+        // if(m_wcArbiter >= 180)
+        //   abort();
  
         if (m_reza_log)
           cout << "the request address " << tempOldestReqMsg.addr << "  msgID  " << tempOldestReqMsg.msgId << "   is removed from Oldest" << endl;
@@ -2309,35 +2297,35 @@ namespace ns3
     
     cout<<"*************************************************************"<<endl; 
     bool temporal = false;
-    if (m_reza_log)
-      cout << "-------------------------------REQ BUS ARBITER 00 ----------------------------------" << endl;
+    // if (m_reza_log)
+    //   cout << "-------------------------------REQ BUS ARBITER 00 ----------------------------------" << endl;
 
-    if (m_reza_log)
-      cout << "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ Global Oldest Queue Contains the Following ++++++++++++++++++++++++++++++++++++++++++++++++++++++" << endl;
-    if (m_reza_log)
-    {
-      for (int u = 0; u < m_GlobalQueue->m_GlobalOldestQueue.GetQueueSize(); u++)
-      {
-        BusIfFIFO::BusReqMsg tempOldestReqMsgTemp;
-        tempOldestReqMsgTemp = m_GlobalQueue->m_GlobalOldestQueue.GetFrontElement();
-        m_GlobalQueue->m_GlobalOldestQueue.PopElement();
-        cout << "AT " << u << " ADDR " << tempOldestReqMsgTemp.addr << "  ReqID  " << tempOldestReqMsgTemp.reqCoreId << "  wbID  " << tempOldestReqMsgTemp.wbCoreId << "  MSGID " << tempOldestReqMsgTemp.msgId << "  AGENT  " << tempOldestReqMsgTemp.sharedCacheAgent << endl;
-        m_GlobalQueue->m_GlobalOldestQueue.InsertElement(tempOldestReqMsgTemp);
-      }
-    }
-    if (m_reza_log)
-      cout << "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ Global Service Queue Contains the Following ++++++++++++++++++++++++++++++++++++++++++++++++++++++" << endl;
-    if (m_reza_log)
-    {
-      for (int u = 0; u < m_GlobalQueue->m_GlobalReqFIFO.GetQueueSize(); u++)
-      {
-        BusIfFIFO::BusReqMsg tempNonOldestReqMsgTemp;
-        tempNonOldestReqMsgTemp = m_GlobalQueue->m_GlobalReqFIFO.GetFrontElement();
-        m_GlobalQueue->m_GlobalReqFIFO.PopElement();
-        cout << "AT " << u << " ADDR " << tempNonOldestReqMsgTemp.addr << "  ReqID  " << tempNonOldestReqMsgTemp.reqCoreId << "  wbID  " << tempNonOldestReqMsgTemp.wbCoreId << "  MSGID " << tempNonOldestReqMsgTemp.msgId << "  AGENT  " << tempNonOldestReqMsgTemp.sharedCacheAgent << endl;
-        m_GlobalQueue->m_GlobalReqFIFO.InsertElement(tempNonOldestReqMsgTemp);
-      }
-    }
+    // if (m_reza_log)
+    //   cout << "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ Global Oldest Queue Contains the Following ++++++++++++++++++++++++++++++++++++++++++++++++++++++" << endl;
+    // if (m_reza_log)
+    // {
+    //   for (int u = 0; u < m_GlobalQueue->m_GlobalOldestQueue.GetQueueSize(); u++)
+    //   {
+    //     BusIfFIFO::BusReqMsg tempOldestReqMsgTemp;
+    //     tempOldestReqMsgTemp = m_GlobalQueue->m_GlobalOldestQueue.GetFrontElement();
+    //     m_GlobalQueue->m_GlobalOldestQueue.PopElement();
+    //     cout << "AT " << u << " ADDR " << tempOldestReqMsgTemp.addr << "  ReqID  " << tempOldestReqMsgTemp.reqCoreId << "  wbID  " << tempOldestReqMsgTemp.wbCoreId << "  MSGID " << tempOldestReqMsgTemp.msgId << "  AGENT  " << tempOldestReqMsgTemp.sharedCacheAgent << endl;
+    //     m_GlobalQueue->m_GlobalOldestQueue.InsertElement(tempOldestReqMsgTemp);
+    //   }
+    // }
+    // if (m_reza_log)
+    //   cout << "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ Global Service Queue Contains the Following ++++++++++++++++++++++++++++++++++++++++++++++++++++++" << endl;
+    // if (m_reza_log)
+    // {
+    //   for (int u = 0; u < m_GlobalQueue->m_GlobalReqFIFO.GetQueueSize(); u++)
+    //   {
+    //     BusIfFIFO::BusReqMsg tempNonOldestReqMsgTemp;
+    //     tempNonOldestReqMsgTemp = m_GlobalQueue->m_GlobalReqFIFO.GetFrontElement();
+    //     m_GlobalQueue->m_GlobalReqFIFO.PopElement();
+    //     cout << "AT " << u << " ADDR " << tempNonOldestReqMsgTemp.addr << "  ReqID  " << tempNonOldestReqMsgTemp.reqCoreId << "  wbID  " << tempNonOldestReqMsgTemp.wbCoreId << "  MSGID " << tempNonOldestReqMsgTemp.msgId << "  AGENT  " << tempNonOldestReqMsgTemp.sharedCacheAgent << endl;
+    //     m_GlobalQueue->m_GlobalReqFIFO.InsertElement(tempNonOldestReqMsgTemp);
+    //   }
+    // }
 
 
 
@@ -2426,44 +2414,35 @@ namespace ns3
       } 
           
       
-      //cout<<"-----------------------------------------------------Remove From the Oldest---------------------------------------------------------"<<endl;
-      // for(int it2 = 0; it2 < m_GlobalQueue->m_GlobalOldestQueue.GetQueueSize(); it2++) {
-      //   BusIfFIFO::BusReqMsg xxx;
-      //   xxx = m_GlobalQueue->m_GlobalOldestQueue.GetFrontElement();
-      //   m_GlobalQueue->m_GlobalOldestQueue.PopElement();
-      //   //cout<<"The address msg in the oldest buffer at "<<it2<<" address is  "<<xxx.addr<<" reqCoreID "<<xxx.reqCoreId<<endl;
-      //   m_GlobalQueue->m_GlobalOldestQueue.InsertElement(xxx);
-      // }
-      // cout<<"------------------------------------------------------------------------------------------------------------------------------------"<<endl;
-      if (m_reza_log)
-        cout << "-------------------------------REQ BUS ARBITER 80----------------------------------" << endl;
+      // if (m_reza_log)
+      //   cout << "-------------------------------REQ BUS ARBITER 80----------------------------------" << endl;
 
-      if (m_reza_log)
-        cout << "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ Global Oldest Queue Contains the Following ++++++++++++++++++++++++++++++++++++++++++++++++++++++" << endl;
-      if (m_reza_log)
-      {
-        for (int u = 0; u < m_GlobalQueue->m_GlobalOldestQueue.GetQueueSize(); u++)
-        {
-          BusIfFIFO::BusReqMsg tempOldestReqMsgTemp;
-          tempOldestReqMsgTemp = m_GlobalQueue->m_GlobalOldestQueue.GetFrontElement();
-          m_GlobalQueue->m_GlobalOldestQueue.PopElement();
-          cout << "AT " << u << " ADDR " << tempOldestReqMsgTemp.addr << "  ReqID  " << tempOldestReqMsgTemp.reqCoreId << "  wbID  " << tempOldestReqMsgTemp.wbCoreId << "  MSGID " << tempOldestReqMsgTemp.msgId << "  AGENT  " << tempOldestReqMsgTemp.sharedCacheAgent << endl;
-          m_GlobalQueue->m_GlobalOldestQueue.InsertElement(tempOldestReqMsgTemp);
-        }
-      }
-      if (m_reza_log)
-        cout << "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ Global Service Queue Contains the Following ++++++++++++++++++++++++++++++++++++++++++++++++++++++" << endl;
-      if (m_reza_log)
-      {
-        for (int u = 0; u < m_GlobalQueue->m_GlobalReqFIFO.GetQueueSize(); u++)
-        {
-          BusIfFIFO::BusReqMsg tempNonOldestReqMsgTemp;
-          tempNonOldestReqMsgTemp = m_GlobalQueue->m_GlobalReqFIFO.GetFrontElement();
-          m_GlobalQueue->m_GlobalReqFIFO.PopElement();
-          cout << "AT " << u << " ADDR " << tempNonOldestReqMsgTemp.addr << "  ReqID  " << tempNonOldestReqMsgTemp.reqCoreId << "  wbID  " << tempNonOldestReqMsgTemp.wbCoreId << "  MSGID " << tempNonOldestReqMsgTemp.msgId << "  AGENT  " << tempNonOldestReqMsgTemp.sharedCacheAgent << endl;
-          m_GlobalQueue->m_GlobalReqFIFO.InsertElement(tempNonOldestReqMsgTemp);
-        }
-      }
+      // if (m_reza_log)
+      //   cout << "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ Global Oldest Queue Contains the Following ++++++++++++++++++++++++++++++++++++++++++++++++++++++" << endl;
+      // if (m_reza_log)
+      // {
+      //   for (int u = 0; u < m_GlobalQueue->m_GlobalOldestQueue.GetQueueSize(); u++)
+      //   {
+      //     BusIfFIFO::BusReqMsg tempOldestReqMsgTemp;
+      //     tempOldestReqMsgTemp = m_GlobalQueue->m_GlobalOldestQueue.GetFrontElement();
+      //     m_GlobalQueue->m_GlobalOldestQueue.PopElement();
+      //     cout << "AT " << u << " ADDR " << tempOldestReqMsgTemp.addr << "  ReqID  " << tempOldestReqMsgTemp.reqCoreId << "  wbID  " << tempOldestReqMsgTemp.wbCoreId << "  MSGID " << tempOldestReqMsgTemp.msgId << "  AGENT  " << tempOldestReqMsgTemp.sharedCacheAgent << endl;
+      //     m_GlobalQueue->m_GlobalOldestQueue.InsertElement(tempOldestReqMsgTemp);
+      //   }
+      // }
+      // if (m_reza_log)
+      //   cout << "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ Global Service Queue Contains the Following ++++++++++++++++++++++++++++++++++++++++++++++++++++++" << endl;
+      // if (m_reza_log)
+      // {
+      //   for (int u = 0; u < m_GlobalQueue->m_GlobalReqFIFO.GetQueueSize(); u++)
+      //   {
+      //     BusIfFIFO::BusReqMsg tempNonOldestReqMsgTemp;
+      //     tempNonOldestReqMsgTemp = m_GlobalQueue->m_GlobalReqFIFO.GetFrontElement();
+      //     m_GlobalQueue->m_GlobalReqFIFO.PopElement();
+      //     cout << "AT " << u << " ADDR " << tempNonOldestReqMsgTemp.addr << "  ReqID  " << tempNonOldestReqMsgTemp.reqCoreId << "  wbID  " << tempNonOldestReqMsgTemp.wbCoreId << "  MSGID " << tempNonOldestReqMsgTemp.msgId << "  AGENT  " << tempNonOldestReqMsgTemp.sharedCacheAgent << endl;
+      //     m_GlobalQueue->m_GlobalReqFIFO.InsertElement(tempNonOldestReqMsgTemp);
+      //   }
+      // }
     }
 
   }
@@ -2520,35 +2499,35 @@ namespace ns3
   {
     
     
-    if (m_reza_log)
-      cout << "-------------------------------RESPONSE BUS ARBITER ----------------------------------" << endl;
+    // if (m_reza_log)
+    //   cout << "-------------------------------RESPONSE BUS ARBITER ----------------------------------" << endl;
 
-    if (m_reza_log)
-      cout << "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ Global Oldest Queue Contains the Following ++++++++++++++++++++++++++++++++++++++++++++++++++++++" << endl;
-    if (m_reza_log)
-    {
-      for (int u = 0; u < m_GlobalQueue->m_GlobalOldestQueue.GetQueueSize(); u++)
-      {
-        BusIfFIFO::BusReqMsg tempOldestReqMsgTemp;
-        tempOldestReqMsgTemp = m_GlobalQueue->m_GlobalOldestQueue.GetFrontElement();
-        m_GlobalQueue->m_GlobalOldestQueue.PopElement();
-        cout << "AT " << u << " ADDR " << tempOldestReqMsgTemp.addr << "  ReqID  " << tempOldestReqMsgTemp.reqCoreId << "  wbID  " << tempOldestReqMsgTemp.wbCoreId << "  MSGID " << tempOldestReqMsgTemp.msgId << "  AGENT  " << tempOldestReqMsgTemp.sharedCacheAgent << endl;
-        m_GlobalQueue->m_GlobalOldestQueue.InsertElement(tempOldestReqMsgTemp);
-      }
-    }
-    if (m_reza_log)
-      cout << "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ Global Service Queue Contains the Following ++++++++++++++++++++++++++++++++++++++++++++++++++++++" << endl;
-    if (m_reza_log)
-    {
-      for (int u = 0; u < m_GlobalQueue->m_GlobalReqFIFO.GetQueueSize(); u++)
-      {
-        BusIfFIFO::BusReqMsg tempNonOldestReqMsgTemp;
-        tempNonOldestReqMsgTemp = m_GlobalQueue->m_GlobalReqFIFO.GetFrontElement();
-        m_GlobalQueue->m_GlobalReqFIFO.PopElement();
-        cout << "AT " << u << " ADDR " << tempNonOldestReqMsgTemp.addr << "  ReqID  " << tempNonOldestReqMsgTemp.reqCoreId << "  wbID  " << tempNonOldestReqMsgTemp.wbCoreId << "  MSGID " << tempNonOldestReqMsgTemp.msgId << "  AGENT  " << tempNonOldestReqMsgTemp.sharedCacheAgent << endl;
-        m_GlobalQueue->m_GlobalReqFIFO.InsertElement(tempNonOldestReqMsgTemp);
-      }
-    }
+    // if (m_reza_log)
+    //   cout << "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ Global Oldest Queue Contains the Following ++++++++++++++++++++++++++++++++++++++++++++++++++++++" << endl;
+    // if (m_reza_log)
+    // {
+    //   for (int u = 0; u < m_GlobalQueue->m_GlobalOldestQueue.GetQueueSize(); u++)
+    //   {
+    //     BusIfFIFO::BusReqMsg tempOldestReqMsgTemp;
+    //     tempOldestReqMsgTemp = m_GlobalQueue->m_GlobalOldestQueue.GetFrontElement();
+    //     m_GlobalQueue->m_GlobalOldestQueue.PopElement();
+    //     cout << "AT " << u << " ADDR " << tempOldestReqMsgTemp.addr << "  ReqID  " << tempOldestReqMsgTemp.reqCoreId << "  wbID  " << tempOldestReqMsgTemp.wbCoreId << "  MSGID " << tempOldestReqMsgTemp.msgId << "  AGENT  " << tempOldestReqMsgTemp.sharedCacheAgent << endl;
+    //     m_GlobalQueue->m_GlobalOldestQueue.InsertElement(tempOldestReqMsgTemp);
+    //   }
+    // }
+    // if (m_reza_log)
+    //   cout << "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ Global Service Queue Contains the Following ++++++++++++++++++++++++++++++++++++++++++++++++++++++" << endl;
+    // if (m_reza_log)
+    // {
+    //   for (int u = 0; u < m_GlobalQueue->m_GlobalReqFIFO.GetQueueSize(); u++)
+    //   {
+    //     BusIfFIFO::BusReqMsg tempNonOldestReqMsgTemp;
+    //     tempNonOldestReqMsgTemp = m_GlobalQueue->m_GlobalReqFIFO.GetFrontElement();
+    //     m_GlobalQueue->m_GlobalReqFIFO.PopElement();
+    //     cout << "AT " << u << " ADDR " << tempNonOldestReqMsgTemp.addr << "  ReqID  " << tempNonOldestReqMsgTemp.reqCoreId << "  wbID  " << tempNonOldestReqMsgTemp.wbCoreId << "  MSGID " << tempNonOldestReqMsgTemp.msgId << "  AGENT  " << tempNonOldestReqMsgTemp.sharedCacheAgent << endl;
+    //     m_GlobalQueue->m_GlobalReqFIFO.InsertElement(tempNonOldestReqMsgTemp);
+    //   }
+    // }
 
       
       if (m_PndMemResp)
@@ -2947,7 +2926,7 @@ namespace ns3
           if (busArbiter->arb_resp_mode == "RT")
           {
               busArbiter->m_PndMemResp = false;
-              cout << "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  switch from RT to HP  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%";
+              cout << "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  switch from RT to HP  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"<<endl;
           }
           busArbiter->arb_resp_mode = "HP";
       }
@@ -3004,8 +2983,8 @@ namespace ns3
       cout << "-----------------------------------------------------------------CLOCK: " << m_arbiCycle << "----------------------------------------------------------" << endl;
     //  if(m_arbiCycle > 1 ){
     //    //m_reza_log = true;
-    //  if(m_arbiCycle == 500)
-    //   abort();
+     if(m_arbiCycle == 100000)
+      abort();
     //  }
 
     Simulator::Schedule(NanoSeconds(m_dt), &BusArbiter::Step, Ptr<BusArbiter>(this));
