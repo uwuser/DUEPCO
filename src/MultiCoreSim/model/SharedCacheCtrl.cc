@@ -58,7 +58,7 @@ namespace ns3 {
         m_Nmiss           = 0;
         m_sharedCacheBusy = false;
         m_direction       = false;
-        m_reza_log_shared = false;
+        m_reza_log_shared = true;
         m_mode            = "HP"; 
         m_wcShared        = 0;
         
@@ -884,8 +884,7 @@ namespace ns3 {
         }
         else{
           m_GlobalQueue->m_GlobalOldestQueue.InsertElement(tempOldestReqMsg);
-        }
-                
+        }                
       }
       return success;
     }

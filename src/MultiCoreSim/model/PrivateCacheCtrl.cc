@@ -147,11 +147,12 @@ namespace ns3 {
       unsigned int WCL_0;
       unsigned int WCL_1;
       unsigned int WCL_2;
-      WCL_0 = 500;
-      WCL_1 = 500;
-      WCL_2 = 500; 
+      WCL_0 = 158;
+      WCL_1 = 158;
+      WCL_2 = 158; 
       if(msg.orderDetermined) {
         cout<<"determined become "<<msg.becameOldest<<endl;
+        cout<<"before deadline assigned "<<msg.associateDeadline<<endl;
         switch (msg.orderofArbitration) {
           case 0: 
             msg.associateDeadline = WCL_0 - (m_cacheCycle - msg.becameOldest);          
@@ -163,7 +164,7 @@ namespace ns3 {
             msg.associateDeadline = WCL_2 - (m_cacheCycle - msg.becameOldest);
             break;
         }
-        cout<<"deadline assigned "<<msg.associateDeadline<<endl;
+        cout<<"after deadline assigned "<<msg.associateDeadline<<endl;
         msg.associateDeadline_final = true;
       }      
     }
