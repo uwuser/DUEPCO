@@ -878,7 +878,8 @@ namespace ns3 {
       for(int itr = 0; itr < queueSize; itr ++) {
         tempOldestReqMsg = m_GlobalQueue->m_GlobalOldestQueue.GetFrontElement();       
         m_GlobalQueue->m_GlobalOldestQueue.PopElement();
-        if(tempOldestReqMsg.addr == adr && tempOldestReqMsg.reqCoreId == coreIndex) {
+        if((tempOldestReqMsg.addr == adr && tempOldestReqMsg.reqCoreId == coreIndex && tempOldestReqMsg.msgId != 0) ||
+           (tempOldestReqMsg.addr == adr && tempOldestReqMsg.wbCoreId == coreIndex && tempOldestReqMsg.msgId == 0)) {
           success = true;    
           m_GlobalQueue->m_GlobalOldestQueue.InsertElement(tempOldestReqMsg);                                     
         }
@@ -886,6 +887,7 @@ namespace ns3 {
           m_GlobalQueue->m_GlobalOldestQueue.InsertElement(tempOldestReqMsg);
         }                
       }
+      cout<<" oldest:  "<<success<<endl;
       return success;
     }
 
@@ -1402,12 +1404,13 @@ namespace ns3 {
                for(unsigned int i=0; i< m_GlobalQueue->m_GlobalRRQueue.size();i++){ if(m_reza_log_shared) cout<<" 1 Order is: "<<m_GlobalQueue->m_GlobalRRQueue.at(i)<<endl;}
 
                if(m_CurrEventMsg.busRespMsg.respCoreId == m_coreId || m_CurrEventMsg.busRespMsg.msgId == 0) { 
-                
-                if(isOldest(m_CurrEventMsg.busRespMsg.addr,m_CurrEventMsg.busRespMsg.reqCoreId)) {  // 0- check first if it is the oldest of its requestor
-                  //cout<<"It is oldest the order now is "<<m_GlobalQueue->m_GlobalRRQueue.at(0)<<endl;
+                cout<<"m_CurrEventMsg.busRespMsg.respCoreId "<<m_CurrEventMsg.busRespMsg.respCoreId<<" m_coreid "<<m_coreId<<" m_CurrEventMsg.busRespMsg.msgId "<<m_CurrEventMsg.busRespMsg.msgId<<endl;
+                if(((m_CurrEventMsg.busRespMsg.msgId != 0) && (isOldest(m_CurrEventMsg.busRespMsg.addr,m_CurrEventMsg.busRespMsg.reqCoreId))) || 
+                   ((m_CurrEventMsg.busRespMsg.msgId == 0) && (isOldest(m_CurrEventMsg.busRespMsg.addr,m_CurrEventMsg.busRespMsg.respCoreId)))) {  // 0- check first if it is the oldest of its requestor
+                  cout<<"It is oldest the order now is "<<m_GlobalQueue->m_GlobalRRQueue.at(0)<<endl;
                   // 1- If YES, adjust the order 
                   for(unsigned int h = 0; h < m_GlobalQueue->m_GlobalRRQueue.size() ; h++) {
-                    if(m_GlobalQueue->m_GlobalRRQueue.at(h) == m_reqCoreCnt) {
+                    if(m_GlobalQueue->m_GlobalRRQueue.at(h) == m_CurrEventMsg.busRespMsg.respCoreId) {
                       m_GlobalQueue->m_GlobalRRQueue.erase(m_GlobalQueue->m_GlobalRRQueue.begin() + h);
                     }
                   }

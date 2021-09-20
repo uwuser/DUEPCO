@@ -60,6 +60,8 @@ namespace ns3 {
              m_PndOld,
              m_PndResp;
     int      m_TimeOut;
+    int      m_delaycycle;
+    uint64_t      m_delaycyclereg;
     bool     m_FcFsPndMemResp,
              m_PndPutMChk,
              m_DirectTransfer,
