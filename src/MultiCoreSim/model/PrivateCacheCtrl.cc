@@ -142,17 +142,17 @@ namespace ns3 {
     }
     
     void PrivateCacheCtrl::assignDeadlineAfterDetermination(ns3::BusIfFIFO::BusReqMsg &msg) {
-      cout<<"In the assignDeadlineAfterDetermination"<<endl;
+      //cout<<"In the assignDeadlineAfterDetermination"<<endl;
       //abort();
       unsigned int WCL_0;
       unsigned int WCL_1;
       unsigned int WCL_2;
-      WCL_0 = 158;
-      WCL_1 = 158;
-      WCL_2 = 158; 
+      WCL_0 = 287;
+      WCL_1 = 287;
+      WCL_2 = 287; 
       if(msg.orderDetermined) {
-        cout<<"determined become "<<msg.becameOldest<<endl;
-        cout<<"before deadline assigned "<<msg.associateDeadline<<endl;
+        //cout<<"determined become "<<msg.becameOldest<<endl;
+        //cout<<"before deadline assigned "<<msg.associateDeadline<<endl;
         switch (msg.orderofArbitration) {
           case 0: 
             msg.associateDeadline = WCL_0 - (m_cacheCycle - msg.becameOldest);          
@@ -164,7 +164,7 @@ namespace ns3 {
             msg.associateDeadline = WCL_2 - (m_cacheCycle - msg.becameOldest);
             break;
         }
-        cout<<"after deadline assigned "<<msg.associateDeadline<<endl;
+        //cout<<"after deadline assigned "<<msg.associateDeadline<<endl;
         msg.associateDeadline_final = true;
       }      
     }
@@ -186,6 +186,10 @@ namespace ns3 {
       else if(id == 1) return 11;
       else if(id == 2) return 12;
       else if(id == 3) return 13;
+      else if(id == 4) return 14;
+      else if(id == 5) return 15;
+      else if(id == 6) return 16;
+      else if(id == 7) return 17;
       cout<<"retrieveCacheFIFOID cannot find  "<<id<<" as Shared Cache FIFO ID"<<endl;
       abort();
       return 0;
@@ -194,7 +198,7 @@ namespace ns3 {
     void associateDeadlinef (ns3::BusIfFIFO::BusReqMsg msg){
       if(msg.msgId == 0 ){ 
         //assign the correct one from here
-        cout<<"determine the tightest WC in PrivateCacheCtrl"<<endl;
+        //cout<<"determine the tightest WC in PrivateCacheCtrl"<<endl;
         // abort();
         unsigned smallestWC = 200;
         msg.associateDeadline = smallestWC;
@@ -203,7 +207,7 @@ namespace ns3 {
       else{
         unsigned smallestWC = 200;
         msg.associateDeadline = smallestWC;
-        cout<<"determine the tightest WC in PrivateCacheCtrl"<<endl;
+        //cout<<"determine the tightest WC in PrivateCacheCtrl"<<endl;
         msg.associateDeadline_final = false;
         //abort();
       }      
@@ -411,7 +415,7 @@ namespace ns3 {
          wbMsg.msgId        = msgId;
          wbMsg.dualTrans    = dualTrans;
          if (m_logFileGenEnable) {
-           std::cout << "DoWriteBack:: coreId = " << m_coreId << " requested Core = " << wbCoreId << std::endl;
+           std::cout << "DoWriteBack:: coreId = " << m_coreId << " requested Core = " << wbCoreId <<"  dual: "<<dualTrans<< std::endl;
          }
          for (int i = 0; i < 8; i++)
            wbMsg.data[i] = wbLine.data[i];
@@ -689,9 +693,10 @@ namespace ns3 {
                               (currEventCtrlAction == SNOOPPrivCtrlAction::CopyThenHitSendMemOnly ) ? MemOnly  :
                               (currEventCtrlAction == SNOOPPrivCtrlAction::CopyThenHitSendCoreMem ) ? CorePlsMem : CorePlsMem ;
 
-              // if(currEventCtrlAction == SNOOPPrivCtrlAction::CopyThenHitSendCoreOnly ) cout<<"CORE ONLY"<<endl;
-              // else if(currEventCtrlAction == SNOOPPrivCtrlAction::CopyThenHitSendMemOnly) cout<<"Mem Only"<<endl;
-              // else if(currEventCtrlAction == SNOOPPrivCtrlAction::CopyThenHitSendCoreMem) cout<<"Core Plus Mem"<<endl;
+              if(currEventCtrlAction == SNOOPPrivCtrlAction::CopyThenHitSendCoreOnly ) cout<<"CORE ONLY"<<endl;
+              else if(currEventCtrlAction == SNOOPPrivCtrlAction::CopyThenHitSendMemOnly) cout<<"Mem Only"<<endl;
+              else if(currEventCtrlAction == SNOOPPrivCtrlAction::CopyThenHitSendCoreMem) cout<<"Core Plus Mem"<<endl;
+              else cout<<"nothing"<<endl;
 
       
              if (!SendPendingWB (addrMap,type)) {
@@ -787,7 +792,7 @@ namespace ns3 {
            }
           if(m_reza_log_private) cout<<" m_coreID "<<m_coreId<<"  m_sharedMemID  "<<m_sharedMemId<<endl;
 
-          unsigned int mask = createMask(6,6);
+          unsigned int mask = createMask(6,8);
           unsigned bank_num = mask & cpuReqMsg.addr;
           bank_num = bank_num >> 6;
           cpuReqMsg.sharedCacheAgent = retrieveCacheFIFOID(bank_num);
@@ -911,7 +916,7 @@ namespace ns3 {
            if(currEventCtrlAction == SNOOPPrivCtrlAction::WritBack) cout<<"From "<<m_coreId<<" It is WriteBack"<<endl;
 
            if(currEventCtrlAction == SNOOPPrivCtrlAction::SendMemOnly) {
-             cout<<"From "<<m_coreId<<" It is SendMemOnly"<<endl;
+             if(m_reza_log_private) cout<<"From "<<m_coreId<<" It is SendMemOnly"<<endl;
              busReqMsg.orderDetermined = true;
              busReqMsg.orderofArbitration = 1;
              busReqMsg.currStage = "REQ";
@@ -919,7 +924,7 @@ namespace ns3 {
              m_GlobalQueue->m_MsgType.InsertElement(busReqMsg);
            }
            else if(currEventCtrlAction == SNOOPPrivCtrlAction::SendCoreOnly) {
-             cout<<"From "<<m_coreId<<" It is SendCoreOnly"<<endl;
+             if(m_reza_log_private) cout<<"From "<<m_coreId<<" It is SendCoreOnly"<<endl;
              busReqMsg.orderDetermined = true;
              busReqMsg.orderofArbitration = 2;
              busReqMsg.currStage = "REQ";
@@ -927,7 +932,7 @@ namespace ns3 {
              m_GlobalQueue->m_MsgType.InsertElement(busReqMsg);
            } 
            else if(currEventCtrlAction == SNOOPPrivCtrlAction::SendCoreMem) {
-             cout<<"From "<<m_coreId<<" It is SendCoreMem"<<endl;
+             if(m_reza_log_private) cout<<"From "<<m_coreId<<" It is SendCoreMem"<<endl;
              busReqMsg.orderDetermined = true;
              busReqMsg.orderofArbitration = 1;
              busReqMsg.currStage = "REQ";
@@ -1005,7 +1010,7 @@ namespace ns3 {
            m_busIfFIFO->m_rxMsgFIFO.PopElement();
            // save pending write back coreId & address
            
-            cout<<"From "<<m_coreId<<" save write back coreID msgID is "<<busReqMsg.msgId<<endl;   
+            if(m_reza_log_private) cout<<"From "<<m_coreId<<" save write back coreID msgID is "<<busReqMsg.msgId<<endl;   
             busReqMsg.orderDetermined = true;
             busReqMsg.orderofArbitration = 2;
             busReqMsg.currStage = "REQ";
@@ -1013,7 +1018,7 @@ namespace ns3 {
             assignDeadlineAfterDetermination(busReqMsg);
             
 
-            cout<<"associate deadline is "<<busReqMsg.associateDeadline<<endl;
+            if(m_reza_log_private) cout<<"associate deadline is "<<busReqMsg.associateDeadline<<endl;
             m_GlobalQueue->m_MsgType.InsertElement(busReqMsg);            
 
            if(m_reza_log_private) cout<<"SAVEWBCOREID %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"<<endl;

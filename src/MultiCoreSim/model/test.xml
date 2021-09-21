@@ -40,7 +40,7 @@
     	ReqBusArb="TDM"
     	RespBusArb="RR"
     	ReqBusLat="4"
-    	RespBusLat="20"
+    	RespBusLat="10"
     	WrkConserv="1"
 		Duetto="1">
     </L1BusCnfg>
@@ -164,7 +164,6 @@
   <sharedCaches>
     <sharedCache 
     	cacheId="10" 
-
     	cpuClkMHz="100" 
     	cpuClkSkew="60" 
     	ctrlClkMHz="200" 
@@ -173,7 +172,7 @@
     	blockSize="64" 
     	cacheSize="268435456" 
     	mapping="1" 
-		cachelatency="20"
+		cachelatency="50"
     	nways="8">
     </sharedCache>
 	<sharedCache 
@@ -186,7 +185,85 @@
     	blockSize="64" 
     	cacheSize="268435456" 
     	mapping="1" 
-		cachelatency="20"
+		cachelatency="50"
+    	nways="8">
+    </sharedCache>
+	<sharedCache 
+    	cacheId="12" 
+    	cpuClkMHz="100" 
+    	cpuClkSkew="60" 
+    	ctrlClkMHz="200" 
+    	ctrlClkSkew="50" 
+    	ReplcPolc= "RANDOM"
+    	blockSize="64" 
+    	cacheSize="268435456" 
+    	mapping="1" 
+		cachelatency="50"
+    	nways="8">
+    </sharedCache>
+	<sharedCache 
+    	cacheId="13" 
+    	cpuClkMHz="100" 
+    	cpuClkSkew="60" 
+    	ctrlClkMHz="200" 
+    	ctrlClkSkew="50" 
+    	ReplcPolc= "RANDOM"
+    	blockSize="64" 
+    	cacheSize="268435456" 
+    	mapping="1" 
+		cachelatency="50"
+    	nways="8">
+    </sharedCache>
+	<sharedCache 
+    	cacheId="14" 
+    	cpuClkMHz="100" 
+    	cpuClkSkew="60" 
+    	ctrlClkMHz="200" 
+    	ctrlClkSkew="50" 
+    	ReplcPolc= "RANDOM"
+    	blockSize="64" 
+    	cacheSize="268435456" 
+    	mapping="1" 
+		cachelatency="50"
+    	nways="8">
+    </sharedCache>
+	<sharedCache 
+    	cacheId="15" 
+    	cpuClkMHz="100" 
+    	cpuClkSkew="60" 
+    	ctrlClkMHz="200" 
+    	ctrlClkSkew="50" 
+    	ReplcPolc= "RANDOM"
+    	blockSize="64" 
+    	cacheSize="268435456" 
+    	mapping="1" 
+		cachelatency="50"
+    	nways="8">
+    </sharedCache>
+	<sharedCache 
+    	cacheId="16" 
+    	cpuClkMHz="100" 
+    	cpuClkSkew="60" 
+    	ctrlClkMHz="200" 
+    	ctrlClkSkew="50" 
+    	ReplcPolc= "RANDOM"
+    	blockSize="64" 
+    	cacheSize="268435456" 
+    	mapping="1" 
+		cachelatency="50"
+    	nways="8">
+    </sharedCache>
+	<sharedCache 
+    	cacheId="17" 
+    	cpuClkMHz="100" 
+    	cpuClkSkew="60" 
+    	ctrlClkMHz="200" 
+    	ctrlClkSkew="50" 
+    	ReplcPolc= "RANDOM"
+    	blockSize="64" 
+    	cacheSize="268435456" 
+    	mapping="1" 
+		cachelatency="50"
     	nways="8">
     </sharedCache>
 	<!-- <sharedCache 

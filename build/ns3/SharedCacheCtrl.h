@@ -76,6 +76,7 @@ namespace ns3 {
      string     m_mode;
      uint64_t   m_wcShared;
      bool       m_txexist;
+     bool       m_txexistRT;
      
 
 
@@ -134,7 +135,9 @@ namespace ns3 {
     // SNOOPSharedReqBusEvent  ChkBusRxReqEvent  (BusIfFIFO::BusReqMsg &  busReqMsg,  bool & not_busy, bool bypass);
      SNOOPSharedReqBusEvent  ChkBusRxReqEvent  (BusIfFIFO::BusReqMsg &  busReqMsg);
 
-     SNOOPSharedRespBusEvent ChkBusRxRespEvent (BusIfFIFO::BusRespMsg & busRespMsg, BusIfFIFO::BusRespMsg busRespMsg_temp);  
+     bool isHigherPrio(unsigned int l, unsigned int h);  
+
+     SNOOPSharedRespBusEvent ChkBusRxRespEvent (BusIfFIFO::BusRespMsg & busRespMsg, BusIfFIFO::BusRespMsg busRespMsg_temp, BusIfFIFO::BusRespMsg busRespMsg_temp_RT);  
      
      SNOOPSharedCtrlEvent ChkDRAMReqEvent (SNOOPSharedReqBusEvent busReqEvent);
 

@@ -73,6 +73,10 @@ namespace ns3 {
       else if(id == 1) return 11;
       else if(id == 2) return 12;
       else if(id == 3) return 13;
+      else if(id == 4) return 14;
+      else if(id == 5) return 15;
+      else if(id == 6) return 16;
+      else if(id == 7) return 17;
       cout<<"retrieveCacheFIFOID cannot find  "<<id<<" as Shared Cache FIFO ID"<<endl;
       abort();
       return 0;
@@ -165,7 +169,7 @@ namespace ns3 {
              //std::cout<<"new is retrieved and address is  "<<m_cpuMemReq.addr<<endl;
              /***** need to determin which shared cache it targets  *****/
 
-            unsigned int mask = createMask(6,6);
+            unsigned int mask = createMask(6,8);
             unsigned bank_num = mask & m_cpuMemReq.addr;
             bank_num = bank_num >> 6;
             m_cpuMemReq.sharedCacheAgent = retrieveCacheFIFOID(bank_num);

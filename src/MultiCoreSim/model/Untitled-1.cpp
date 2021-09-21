@@ -372,6 +372,14 @@ namespace ns3
             return 12;
         else if (id == 3)
             return 13;
+        else if (id == 4)
+            return 14;
+        else if (id == 5)
+            return 15;
+        else if (id == 6)
+            return 16;
+        else if (id == 7)
+            return 17;    
         cout << "retrieveCacheFIFOID cannot find  " << id << " as Shared Cache FIFO ID" << endl;
         abort();
         return 0;
