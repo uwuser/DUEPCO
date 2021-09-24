@@ -440,8 +440,10 @@ namespace ns3 {
        }
        // process BusEvent
        else if (eventType == SNOOPPrivEventType::ReqBus) {
+         //cout<<"req Bus"<<endl;
          switch (eventList.busReqEvent) {
            case SNOOPPrivReqBusEvent::OwnGetS:{
+             //cout<<"req Bus 0"<<endl;
              switch (cacheState_c) {
                case SNOOP_MSIPrivCacheState::IS_ad: 
                  cacheState_n = SNOOP_MSIPrivCacheState::IS_d;
@@ -456,6 +458,7 @@ namespace ns3 {
              break;
            } 
            case SNOOPPrivReqBusEvent::OwnGetM:{
+             //cout<<"req Bus 1"<<endl;
              switch (cacheState_c) {
                case SNOOP_MSIPrivCacheState::IM_ad: 
                  cacheState_n = SNOOP_MSIPrivCacheState::IM_d;
@@ -477,6 +480,7 @@ namespace ns3 {
              break;
            }
            case SNOOPPrivReqBusEvent::OwnPutM:{
+             //cout<<"req Bus 2"<<endl;
              switch (cacheState_c) {
                case SNOOP_MSIPrivCacheState::I:
                case SNOOP_MSIPrivCacheState::IS_ad:
@@ -517,6 +521,7 @@ namespace ns3 {
              break;
            }
            case SNOOPPrivReqBusEvent::OtherGetS:{
+             //cout<<"req Bus 3"<<endl;
              switch (cacheState_c) {
                case SNOOP_MSIPrivCacheState::I:
                case SNOOP_MSIPrivCacheState::IS_ad:
@@ -561,6 +566,7 @@ namespace ns3 {
              break;
            }
            case SNOOPPrivReqBusEvent::OtherGetM:{
+             //cout<<"req Bus 4"<<endl;
              switch (cacheState_c) {
                case SNOOP_MSIPrivCacheState::I:
                case SNOOP_MSIPrivCacheState::IS_ad:
@@ -617,6 +623,7 @@ namespace ns3 {
              break;
            }
            case SNOOPPrivReqBusEvent::OtherPutM:{
+             //cout<<"req Bus 5"<<endl;
              switch (cacheState_c) {
                case SNOOP_MSIPrivCacheState::I:
                case SNOOP_MSIPrivCacheState::IS_ad:
@@ -651,6 +658,7 @@ namespace ns3 {
              break;
            }
            case SNOOPPrivReqBusEvent::OwnInvTrans:{
+             //cout<<"req Bus 6"<<endl;
              switch (cacheState_c) {
                case SNOOP_MSIPrivCacheState::I:
                case SNOOP_MSIPrivCacheState::IS_ad:

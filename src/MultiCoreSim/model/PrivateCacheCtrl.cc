@@ -103,6 +103,26 @@ namespace ns3 {
       return m_nways;
     }
 
+    bool PrivateCacheCtrl::isOldest(uint64_t adr, unsigned int coreIndex) {
+      bool success = false;
+      BusIfFIFO::BusReqMsg tempOldestReqMsg;
+      int queueSize = m_GlobalQueue->m_GlobalOldestQueue.GetQueueSize();
+      for(int itr = 0; itr < queueSize; itr ++) {
+        tempOldestReqMsg = m_GlobalQueue->m_GlobalOldestQueue.GetFrontElement();       
+        m_GlobalQueue->m_GlobalOldestQueue.PopElement();
+        if((tempOldestReqMsg.addr == adr && tempOldestReqMsg.reqCoreId == coreIndex && tempOldestReqMsg.msgId != 0) ||
+           (tempOldestReqMsg.addr == adr && tempOldestReqMsg.wbCoreId == coreIndex && tempOldestReqMsg.msgId == 0)) {
+          success = true;    
+          m_GlobalQueue->m_GlobalOldestQueue.InsertElement(tempOldestReqMsg);                                     
+        }
+        else{
+          m_GlobalQueue->m_GlobalOldestQueue.InsertElement(tempOldestReqMsg);
+        }                
+      }
+      //cout<<" oldest:  "<<success<<endl;
+      return success;
+    }
+
     void PrivateCacheCtrl::SetCacheNsets (uint32_t nsets) {
       m_nsets = nsets;
       m_cache->SetCacheNsets(nsets);
@@ -147,9 +167,9 @@ namespace ns3 {
       unsigned int WCL_0;
       unsigned int WCL_1;
       unsigned int WCL_2;
-      WCL_0 = 287;
-      WCL_1 = 287;
-      WCL_2 = 287; 
+      WCL_0 = 413;
+      WCL_1 = 413;
+      WCL_2 = 413; 
       if(msg.orderDetermined) {
         //cout<<"determined become "<<msg.becameOldest<<endl;
         //cout<<"before deadline assigned "<<msg.associateDeadline<<endl;
@@ -456,11 +476,38 @@ namespace ns3 {
             m_PendingWbFIFO.PopElement();
             if (recvTrans.idx_set == pendingWbAddrMap.idx_set &&
                 recvTrans.tag == pendingWbAddrMap.tag) {
-              // b.3.2)send data to requestors
-              //uint16_t reqCoreId = (type == CoreOnly || type == CorePlsMem) ? pendingWbMsg.reqCoreId : m_sharedMemId;
-              uint16_t reqCoreId = (type == CoreOnly || type == CorePlsMem) ? pendingWbMsg.reqCoreId : pendingWbMsg.sharedCacheAgent;
-              bool dualTrans = (type == CorePlsMem);
-              if(m_reza_log_private) cout<<"111send pending WB ********************************************************"<<endl;
+                // b.3.2)send data to requestors
+                //uint16_t reqCoreId = (type == CoreOnly || type == CorePlsMem) ? pendingWbMsg.reqCoreId : m_sharedMemId;
+                uint16_t reqCoreId = (type == CoreOnly || type == CorePlsMem) ? pendingWbMsg.reqCoreId : pendingWbMsg.sharedCacheAgent;
+                bool dualTrans = (type == CorePlsMem);
+                if(m_reza_log_private) cout<<"111send pending WB ********************************************************"<<endl;
+
+                if(m_reza_log_private) cout<<"Now write back can set the stage"<<endl;
+                // if this msg is not in the MType, meaning that someone take the responsibility, we should insert it assuming that it is oldest
+                BusIfFIFO::BusReqMsg tempitrmt;
+                bool existsmt = false;
+                for(int itrmt= 0; itrmt < m_GlobalQueue->m_MsgType.GetQueueSize() && existsmt == false; itrmt++) {
+                  tempitrmt = m_GlobalQueue->m_MsgType.GetFrontElement();
+                  m_GlobalQueue->m_MsgType.PopElement();
+                  if(tempitrmt.msgId == pendingWbMsg.msgId && tempitrmt.addr == pendingWbMsg.addr && tempitrmt.reqCoreId == pendingWbMsg.reqCoreId){
+                    existsmt = true;  
+                    //m_GlobalQueue->m_MsgType.InsertElement(tempitrmt);
+                  }
+                  else{
+                    m_GlobalQueue->m_MsgType.InsertElement(tempitrmt);
+                  }          
+                } 
+                if(existsmt) {
+                  if(m_reza_log_private) cout<<"Found in the memtype  "<<endl;   
+                  tempitrmt.orderDetermined = true;
+                  if(type == CoreOnly)
+                    tempitrmt.orderofArbitration = 2; // it was assumed to be WC, now we can relax
+                  // if((tempitrmt.msgId == 0 && isOldest(tempitrmt.addr,tempitrmt.wbCoreId)) || (tempitrmt.msgId != 0 && isOldest(tempitrmt.addr,tempitrmt.reqCoreId))) 
+                  //   assignDeadlineAfterDetermination(tempitrmt);
+                  m_GlobalQueue->m_MsgType.InsertElement(tempitrmt); 
+               }
+
+
               if (!DoWriteBack (pendingWbMsg.addr, reqCoreId, pendingWbMsg.msgId, dualTrans)) {
                 std::cout << "PrivCache " << m_coreId << " TxResp FIFO is Full!" << std::endl;
                 exit(0);
@@ -693,10 +740,18 @@ namespace ns3 {
                               (currEventCtrlAction == SNOOPPrivCtrlAction::CopyThenHitSendMemOnly ) ? MemOnly  :
                               (currEventCtrlAction == SNOOPPrivCtrlAction::CopyThenHitSendCoreMem ) ? CorePlsMem : CorePlsMem ;
 
-              if(currEventCtrlAction == SNOOPPrivCtrlAction::CopyThenHitSendCoreOnly ) cout<<"CORE ONLY"<<endl;
-              else if(currEventCtrlAction == SNOOPPrivCtrlAction::CopyThenHitSendMemOnly) cout<<"Mem Only"<<endl;
-              else if(currEventCtrlAction == SNOOPPrivCtrlAction::CopyThenHitSendCoreMem) cout<<"Core Plus Mem"<<endl;
-              else cout<<"nothing"<<endl;
+
+              
+
+
+
+              
+
+
+              // if(currEventCtrlAction == SNOOPPrivCtrlAction::CopyThenHitSendCoreOnly ) cout<<"CORE ONLY"<<endl;
+              // else if(currEventCtrlAction == SNOOPPrivCtrlAction::CopyThenHitSendMemOnly) cout<<"Mem Only"<<endl;
+              // else if(currEventCtrlAction == SNOOPPrivCtrlAction::CopyThenHitSendCoreMem) cout<<"Core Plus Mem"<<endl;
+              // else cout<<"nothing"<<endl;
 
       
              if (!SendPendingWB (addrMap,type)) {
@@ -704,7 +759,7 @@ namespace ns3 {
                  // Do write back to memory
                  //f (!DoWriteBack (busRespMsg.addr, m_sharedMemId, busRespMsg.msgId, false)) {
                  if (!DoWriteBack (busRespMsg.addr, busRespMsg.sharedCacheAgent, busRespMsg.msgId, false)) {
-                   cout<<"11############################33  "<<busRespMsg.sharedCacheAgent<<"   previous  "<<m_sharedMemId<<endl;
+                   //cout<<"11############################33  "<<busRespMsg.sharedCacheAgent<<"   previous  "<<m_sharedMemId<<endl;
                    //if (!DoWriteBack (busRespMsg.addr, busRespMsg.sharedCacheAgent, busRespMsg.msgId, false)) {
                    std::cout << "This is will cause stall in the PMSI state machine !!!!" << std::endl;
                    exit(0);
@@ -757,9 +812,20 @@ namespace ns3 {
         * Process CpuReq action
         */
        if (currProcEvent == SNOOPPrivEventType::Core) {
+         
          if(m_reza_log_private) cout<<" Process CpuReq action  1"<<endl;
          
          if (currEventCtrlAction == SNOOPPrivCtrlAction::Hit) {
+           m_GlobalQueue->m_totalL1Hit++;
+           if(m_coreId == 0)       m_GlobalQueue->m_L1Hit_0++;
+           else if (m_coreId == 1) m_GlobalQueue->m_L1Hit_1++;
+           else if (m_coreId == 2) m_GlobalQueue->m_L1Hit_2++;
+           else if (m_coreId == 3) m_GlobalQueue->m_L1Hit_3++;
+           else if (m_coreId == 4) m_GlobalQueue->m_L1Hit_4++;
+           else if (m_coreId == 5) m_GlobalQueue->m_L1Hit_5++;
+           else if (m_coreId == 6) m_GlobalQueue->m_L1Hit_6++;
+           else if (m_coreId == 7) m_GlobalQueue->m_L1Hit_7++;
+           //cout<<"HITTTT in L1"<<endl;
            // Remove message from core's pending-buffer
            // If it is a hit request to this private cache then it should be removed from the pending buffer of this core and then
            // send it to the core itself (core RX interface FIFO)
@@ -1012,7 +1078,8 @@ namespace ns3 {
            
             if(m_reza_log_private) cout<<"From "<<m_coreId<<" save write back coreID msgID is "<<busReqMsg.msgId<<endl;   
             busReqMsg.orderDetermined = true;
-            busReqMsg.orderofArbitration = 2;
+            busReqMsg.orderofArbitration = 1; // since we don't know what will be the arbitration when sending the write back, let's consider it as "1". Then
+            // after WB is specified, we can keep it as is or change it back to "2" which is a more relax consitraint.
             busReqMsg.currStage = "REQ";
             
             assignDeadlineAfterDetermination(busReqMsg);
@@ -1109,7 +1176,7 @@ namespace ns3 {
      } // PrivateCacheCtrl::CacheCtrlMain ()
 
     void PrivateCacheCtrl::CycleProcess() {
-      // if(m_cacheCycle > 1 ){
+      // if(m_cacheCycle > 35000 ){
       //    m_reza_log_private = true;
       //  }
      // cout<<"PrivateCacheCtrl  CycleProcess  "<<endl;

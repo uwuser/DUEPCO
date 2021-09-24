@@ -76,7 +76,12 @@ namespace ns3 {
     int mode;
     string arb_req_mode;
     string arb_resp_mode;
-    
+    long long HPCycle;
+    long long RTCycle;
+    long long SwitchHPRT;
+    long long SwitchRTHP;
+    long long kreturn;
+    long long priorityInversion;
     
 
     bool m_reza_log;

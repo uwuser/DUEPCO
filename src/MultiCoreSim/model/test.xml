@@ -10,7 +10,7 @@
 	totalTimeInSeconds="1" 
 	RunTillEnd="1" 
 	busClkNanoSec="100" 
-	nCores="4" 
+	nCores="8" 
 	cpuFIFOSize="5" 
 	busFIFOSize="30" 
 	Cache2Cache="1" 
@@ -104,7 +104,7 @@
     	mapping="0" 
     	nways="1">
     </privateCache>
-	<!-- <privateCache 
+	<privateCache 
     	cacheId="4" 
     	cpuClkNanoSec="100" 
     	cpuClkSkew="0" 
@@ -159,7 +159,7 @@
     	cacheSize="16384" 
     	mapping="0" 
     	nways="1">
-    </privateCache> -->
+    </privateCache>
   </privateCaches>
   <sharedCaches>
     <sharedCache 
@@ -172,7 +172,7 @@
     	blockSize="64" 
     	cacheSize="268435456" 
     	mapping="1" 
-		cachelatency="50"
+		cachelatency="40"
     	nways="8">
     </sharedCache>
 	<sharedCache 
@@ -185,7 +185,7 @@
     	blockSize="64" 
     	cacheSize="268435456" 
     	mapping="1" 
-		cachelatency="50"
+		cachelatency="40"
     	nways="8">
     </sharedCache>
 	<sharedCache 
@@ -198,7 +198,7 @@
     	blockSize="64" 
     	cacheSize="268435456" 
     	mapping="1" 
-		cachelatency="50"
+		cachelatency="40"
     	nways="8">
     </sharedCache>
 	<sharedCache 
@@ -211,7 +211,7 @@
     	blockSize="64" 
     	cacheSize="268435456" 
     	mapping="1" 
-		cachelatency="50"
+		cachelatency="40"
     	nways="8">
     </sharedCache>
 	<sharedCache 
@@ -224,7 +224,7 @@
     	blockSize="64" 
     	cacheSize="268435456" 
     	mapping="1" 
-		cachelatency="50"
+		cachelatency="40"
     	nways="8">
     </sharedCache>
 	<sharedCache 
@@ -237,7 +237,7 @@
     	blockSize="64" 
     	cacheSize="268435456" 
     	mapping="1" 
-		cachelatency="50"
+		cachelatency="40"
     	nways="8">
     </sharedCache>
 	<sharedCache 
@@ -250,7 +250,7 @@
     	blockSize="64" 
     	cacheSize="268435456" 
     	mapping="1" 
-		cachelatency="50"
+		cachelatency="40"
     	nways="8">
     </sharedCache>
 	<sharedCache 
@@ -263,7 +263,7 @@
     	blockSize="64" 
     	cacheSize="268435456" 
     	mapping="1" 
-		cachelatency="50"
+		cachelatency="40"
     	nways="8">
     </sharedCache>
 	<!-- <sharedCache 

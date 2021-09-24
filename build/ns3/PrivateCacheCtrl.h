@@ -106,6 +106,8 @@ namespace ns3 {
      void associateDeadline (ns3::BusIfFIFO::BusReqMsg msg);
 
      bool PendingCoreBufRemoveMsg  (uint64_t msgId, PendingMsg &removedMsg);
+
+     bool isOldest(uint64_t adr, unsigned int coreIndex);
      
      bool MOESI_Modify_NoGetMResp_TxFIFO (uint64_t addr);
 

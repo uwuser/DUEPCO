@@ -163,11 +163,11 @@ namespace ns3 {
 
      bool sameCacheLineTX(BusIfFIFO::BusRespMsg busRespMsg);
 
-     bool removeFromOldest(uint64_t adr, unsigned int coreIndex);      // Modified to Accomodate Multi Shared Cache
+     bool removeFromOldest(uint64_t adr, unsigned int coreIndex, unsigned ID);     // Modified to Accomodate Multi Shared Cache
 
-     bool removeFromNonOldest(uint64_t adr, unsigned int coreIndex);     // Modified to Accomodate Multi Shared Cache
+      bool removeFromNonOldest(uint64_t adr, unsigned int coreIndex, unsigned int ID);    // Modified to Accomodate Multi Shared Cache
 
-     bool removeFromM_Type(uint64_t adr, unsigned int coreIndex); 
+     bool removeFromM_Type(uint64_t adr, unsigned int coreIndex, unsigned int ID);
 
      void adjustOldest(unsigned int coreIndex);                   // Modified to Accomodate Multi Shared Cache
 

@@ -248,9 +248,36 @@ namespace ns3 {
 
     GenericFIFO <BusIfFIFO::BusReqMsg> m_MsgType;
   
-    unsigned int m_Core2CoreTransfer;              
+    unsigned int m_Core2CoreTransfer;
+    unsigned int m_Core2CoreTransfer_0;
+    unsigned int m_Core2CoreTransfer_1;
+    unsigned int m_Core2CoreTransfer_2;
+    unsigned int m_Core2CoreTransfer_3;
+    unsigned int m_Core2CoreTransfer_4;
+    unsigned int m_Core2CoreTransfer_5;
+    unsigned int m_Core2CoreTransfer_6;
+    unsigned int m_Core2CoreTransfer_7;              
     unsigned int m_SharedBankTransfer;
-
+    unsigned int m_SharedBankTransfer_0;
+    unsigned int m_SharedBankTransfer_1;
+    unsigned int m_SharedBankTransfer_2;
+    unsigned int m_SharedBankTransfer_3;
+    unsigned int m_SharedBankTransfer_4;
+    unsigned int m_SharedBankTransfer_5;
+    unsigned int m_SharedBankTransfer_6;
+    unsigned int m_SharedBankTransfer_7;
+    unsigned int m_totalMsG;
+    unsigned int m_totalResp;
+    unsigned int m_totalReplacement;
+    unsigned int m_totalL1Hit;
+    unsigned int m_L1Hit_0;
+    unsigned int m_L1Hit_1;
+    unsigned int m_L1Hit_2;
+    unsigned int m_L1Hit_3;
+    unsigned int m_L1Hit_4;
+    unsigned int m_L1Hit_5;
+    unsigned int m_L1Hit_6;
+    unsigned int m_L1Hit_7;
     uint16_t m_busArbBlock;
     uint16_t m_respArbBlock;
 
