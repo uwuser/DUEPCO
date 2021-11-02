@@ -177,6 +177,8 @@ namespace ns3 {
 
     bool InsertOnReqBus (BusIfFIFO::BusReqMsg txMsg);
 
+    bool existinTxResp(BusIfFIFO::BusReqMsg Msg);
+
     bool isHigherPrio(unsigned int l, unsigned int h);
 
     bool FcFsMemCheckInsert (uint16_t coreId,uint64_t addr, bool CheckOnly, bool SkipAddrCheck);

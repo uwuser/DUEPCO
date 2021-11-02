@@ -76,7 +76,7 @@ namespace ns3
     }
     m_stallDetectionEnable = true;
     m_stall_cnt = 0;
-    m_reza_log = false;
+    m_reza_log = true;
     m_wcArbiter = 0;
     priorityInversion = 0;
   }
@@ -106,9 +106,9 @@ namespace ns3
     unsigned int WCL_0;
     unsigned int WCL_1;
     unsigned int WCL_2;
-    WCL_0 = 413;
-    WCL_1 = 413;
-    WCL_2 = 413; 
+    WCL_0 = 473;
+    WCL_1 = 473;
+    WCL_2 = 473; 
     if(msg.orderDetermined) {
       if (m_reza_log) cout<<"order determined"<<endl;
       switch (msg.orderofArbitration) {
@@ -162,6 +162,22 @@ namespace ns3
       r |= 1 << i;
     return r;
   }
+  // bool BusArbiter::existinTxResp(BusIfFIFO::BusReqMsg Msg)
+  // {
+  //   BusIfFIFO::BusRespMsg Msg_temp;
+  //   std::list<Ptr<BusIfFIFO>>::iterator itInverti = m_sharedCacheBusIfFIFO.begin();
+  //   std::advance(itInverti, retrieveSharedCacheID(Msg.sharedCacheAgent));     
+  //   for(unsigned int k = 0; k < (*itInverti)->m_txRespFIFO.GetQueueSize(); k++ ){
+  //     Msg_temp = (*itInverti)->m_txRespFIFO.GetFrontElement();
+  //     (*itInverti)->m_txRespFIFO.PopElement();
+  //     if(Msg.addr == Msg_temp.addr && Msg.msgId == Msg_temp.msgId){
+  //        (*itInverti)->m_txRespFIFO.InsertElement(Msg_temp);
+  //       return true;         
+  //     }
+  //     (*itInverti)->m_txRespFIFO.InsertElement(Msg_temp);
+  //   }  
+  //   return false; 
+  // }
   //^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^REWIEWD^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^//
   void BusArbiter::SetCacheNsets (uint32_t nsets) {
     m_nsets = nsets;
@@ -224,7 +240,9 @@ namespace ns3
   {
 
 
-      
+    
+
+
     if (m_reza_log) cout<<"In MSI_FcFsRespBus "<<endl;
     if (m_PndResp)
     {
@@ -343,45 +361,6 @@ namespace ns3
 
   void BusArbiter::MSI_FcFsReqBus()
   {   
-    // insert message on the request bus
-    // it takes the oldest no matter which core
-    // it does not have any TDM slot so not advancing
-    // if (m_reza_log)
-    //   cout << "-------------------------------REQ BUS ARBITER FCFS ----------------------------------" << endl;
-
-    // if (m_reza_log)
-    //   cout << "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ Global Oldest Queue Contains the Following ++++++++++++++++++++++++++++++++++++++++++++++++++++++" << endl;
-    // if (m_reza_log)
-    // {
-    //   for (int u = 0; u < m_GlobalQueue->m_GlobalOldestQueue.GetQueueSize(); u++)
-    //   {
-    //     BusIfFIFO::BusReqMsg tempOldestReqMsgTemp;
-    //     tempOldestReqMsgTemp = m_GlobalQueue->m_GlobalOldestQueue.GetFrontElement();
-    //     m_GlobalQueue->m_GlobalOldestQueue.PopElement();
-    //     cout << "AT " << u << " ADDR " << tempOldestReqMsgTemp.addr << "  ReqID  " << tempOldestReqMsgTemp.reqCoreId << "  wbID  " << tempOldestReqMsgTemp.wbCoreId << "  MSGID " << tempOldestReqMsgTemp.msgId << "  AGENT  " << tempOldestReqMsgTemp.sharedCacheAgent << endl;
-    //     m_GlobalQueue->m_GlobalOldestQueue.InsertElement(tempOldestReqMsgTemp);
-    //   }
-    // }
-    // if (m_reza_log)
-    //   cout << "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ Global Service Queue Contains the Following ++++++++++++++++++++++++++++++++++++++++++++++++++++++" << endl;
-    // if (m_reza_log)
-    // {
-    //   for (int u = 0; u < m_GlobalQueue->m_GlobalReqFIFO.GetQueueSize(); u++)
-    //   {
-    //     BusIfFIFO::BusReqMsg tempNonOldestReqMsgTemp;
-    //     tempNonOldestReqMsgTemp = m_GlobalQueue->m_GlobalReqFIFO.GetFrontElement();
-    //     m_GlobalQueue->m_GlobalReqFIFO.PopElement();
-    //     cout << "AT " << u << " ADDR " << tempNonOldestReqMsgTemp.addr << "  ReqID  " << tempNonOldestReqMsgTemp.reqCoreId << "  wbID  " << tempNonOldestReqMsgTemp.wbCoreId << "  MSGID " << tempNonOldestReqMsgTemp.msgId << "  AGENT  " << tempNonOldestReqMsgTemp.sharedCacheAgent << endl;
-    //     m_GlobalQueue->m_GlobalReqFIFO.InsertElement(tempNonOldestReqMsgTemp);
-    //   }
-    // }
-
-    // for (unsigned int i = 0; i < m_GlobalQueue->m_GlobalRRQueue.size(); i++)
-    // {
-    //   if (m_reza_log)
-    //     cout << " Order is: " << m_GlobalQueue->m_GlobalRRQueue.at(i) << endl;
-    // }
-    
     
 
     if (m_PndReq)
@@ -461,8 +440,8 @@ namespace ns3
   }
 
   bool BusArbiter::WCLator() {
-    //return true;
-    // if (m_reza_log) cout<<"------------------------------------------------------WCLator in Arbiter------------------------------------------------------"<<endl;
+     
+    if (m_reza_log) cout<<"------------------------------------------------------WCLator in Arbiter------------------------------------------------------"<<endl;
     if (m_reza_log) {
       if (m_GlobalQueue->m_GlobalOldestQueue.GetQueueSize() >0)
         cout << "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ Global Oldest Queue Contains the Following WCLATOR  ++++++++++++++++++++++++++++++++++++++++++++++++++++++" << endl;      
@@ -471,17 +450,17 @@ namespace ns3
         BusIfFIFO::BusReqMsg tempOldestReqMsgTemp;
         tempOldestReqMsgTemp = m_GlobalQueue->m_GlobalOldestQueue.GetFrontElement();
         m_GlobalQueue->m_GlobalOldestQueue.PopElement();
-        cout << "AT " << u << " Oldest ADDR " << tempOldestReqMsgTemp.addr << "  ReqID  " << tempOldestReqMsgTemp.reqCoreId << "  wbID  " << tempOldestReqMsgTemp.wbCoreId << "  MSGID " << tempOldestReqMsgTemp.msgId << "  AGENT  " << tempOldestReqMsgTemp.sharedCacheAgent << endl;
+        cout << "AT " << u << " Oldest ADDR " << tempOldestReqMsgTemp.addr << "  ReqID  " << tempOldestReqMsgTemp.reqCoreId << "  wbID  " << tempOldestReqMsgTemp.wbCoreId << "  MSGID " << tempOldestReqMsgTemp.msgId << "  AGENT  " << tempOldestReqMsgTemp.sharedCacheAgent <<"  Arrival"  <<tempOldestReqMsgTemp.timestamp << endl;
         m_GlobalQueue->m_GlobalOldestQueue.InsertElement(tempOldestReqMsgTemp);
       }
-      cout << "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ Global Service Queue Contains the Following ++++++++++++++++++++++++++++++++++++++++++++++++++++++" << endl;  
+      cout << "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ Global Service Queue Contains the Following  size is "<<m_GlobalQueue->m_GlobalReqFIFO.GetQueueSize()<<endl;  
       for (int u = 0; u < m_GlobalQueue->m_GlobalReqFIFO.GetQueueSize(); u++)
       {
         BusIfFIFO::BusReqMsg tempNonOldestReqMsgTemp;
         tempNonOldestReqMsgTemp = m_GlobalQueue->m_GlobalReqFIFO.GetFrontElement();
         m_GlobalQueue->m_GlobalReqFIFO.PopElement();
         cout << "AT " << u << " ADDR " << tempNonOldestReqMsgTemp.addr << "  ReqID  " << tempNonOldestReqMsgTemp.reqCoreId << "  wbID  " << tempNonOldestReqMsgTemp.wbCoreId << "  MSGID " << tempNonOldestReqMsgTemp.msgId << "  AGENT  " << 
-            tempNonOldestReqMsgTemp.sharedCacheAgent << " Cache line " <<retrieveSharedBankCacheLine(tempNonOldestReqMsgTemp.addr) <<endl;
+            tempNonOldestReqMsgTemp.sharedCacheAgent << " Cache line " <<retrieveSharedBankCacheLine(tempNonOldestReqMsgTemp.addr) <<"  Arrival"  <<tempNonOldestReqMsgTemp.timestamp << endl;
         m_GlobalQueue->m_GlobalReqFIFO.InsertElement(tempNonOldestReqMsgTemp);
       }
       if (m_GlobalQueue->m_MsgType.GetQueueSize() > 0 )
@@ -493,7 +472,7 @@ namespace ns3
           tempOldestReqMsgTemp_mtype = m_GlobalQueue->m_MsgType.GetFrontElement();
           m_GlobalQueue->m_MsgType.PopElement();
           cout << "AT " << u << " ADDR " << tempOldestReqMsgTemp_mtype.addr << "  ReqID  " << tempOldestReqMsgTemp_mtype.reqCoreId << "  wbID  " << tempOldestReqMsgTemp_mtype.wbCoreId << "  MSGID " << tempOldestReqMsgTemp_mtype.msgId << "  AGENT  " <<
-              tempOldestReqMsgTemp_mtype.sharedCacheAgent << " curr stage "<< tempOldestReqMsgTemp_mtype.currStage<< " Cache line " <<retrieveSharedBankCacheLine(tempOldestReqMsgTemp_mtype.addr)<<" ORder of Arb "<<tempOldestReqMsgTemp_mtype.orderofArbitration <<endl;
+              tempOldestReqMsgTemp_mtype.sharedCacheAgent << " curr stage "<< tempOldestReqMsgTemp_mtype.currStage<< " Cache line " <<retrieveSharedBankCacheLine(tempOldestReqMsgTemp_mtype.addr)<<" ORder of Arb "<<tempOldestReqMsgTemp_mtype.orderofArbitration <<"  Arrival"  <<tempOldestReqMsgTemp_mtype.timestamp << endl;
           m_GlobalQueue->m_MsgType.InsertElement(tempOldestReqMsgTemp_mtype);
         }
         cout<<"*************************************************************"<<endl; 
@@ -503,20 +482,23 @@ namespace ns3
           cout << " Order is: " << m_GlobalQueue->m_GlobalRRQueue.at(i) << endl;
       }
     }
+    //return false;
 
-    if (m_reza_log) cout << "In BusArbiter::WCLator   " << m_arbiCycle <<" REQ Bus Blocked "<<m_GlobalQueue->m_busArbBlock<<" RESPONSE Bus Blocked "<<m_GlobalQueue->m_respArbBlock<< endl; 
-    if (m_reza_log) {
-      for (std::list<Ptr<BusIfFIFO>>::iterator it13 = m_sharedCacheBusIfFIFO.begin(); it13 != m_sharedCacheBusIfFIFO.end(); it13++)
-      {
-        cout << "For Bank "<<(*it13)->m_fifo_id<<" Bank Block "<<(*it13)->m_bankArbBlock<<endl; 
-      }
-    } 
+    
+
+    // if (m_reza_log) cout << "In BusArbiter::WCLator   " << m_arbiCycle <<" REQ Bus Blocked "<<m_GlobalQueue->m_busArbBlock<<" RESPONSE Bus Blocked "<<m_GlobalQueue->m_respArbBlock<< endl; 
+    // if (m_reza_log) {
+    //   for (std::list<Ptr<BusIfFIFO>>::iterator it13 = m_sharedCacheBusIfFIFO.begin(); it13 != m_sharedCacheBusIfFIFO.end(); it13++)
+    //   {
+    //     cout << "For Bank "<<(*it13)->m_fifo_id<<" Bank Block "<<(*it13)->m_bankArbBlock<<endl; 
+    //   }
+    // } 
     
     
     /** check if HP can potentially issue a request that causes a state where is not desireble. In this case, we limit the number of requests (k) 
      * that target the same bank and same cache line. **/
     
-    unsigned int k = 1;
+    unsigned int k = 3;
     //cout<<"----------------------------------------------"<<endl;
     for (std::list<Ptr<BusIfFIFO>>::iterator itk = m_busIfFIFO.begin(); itk != m_busIfFIFO.end(); itk++)
     {
@@ -1397,7 +1379,7 @@ namespace ns3
               
             if (m_logFileGenEnable)
             {
-              std::cout << "\nBusArbiter: Cpu/Mem Id " << msg.respCoreId << " Sent Data to Core " << msg.reqCoreId << "  the address is  " << msg.addr << " ============================================== " << m_arbiCycle << "\n\n";
+                std::cout << "\nBusArbiter: Cpu/Mem Id " << msg.respCoreId << " Sent Data to Core " << msg.reqCoreId << "  the address is  " << msg.addr << " ============================================== " << m_arbiCycle << "\n\n";
             }
             (*it2)->m_rxRespFIFO.InsertElement(msg);
           }
@@ -1468,7 +1450,7 @@ namespace ns3
     uint16_t core_idx = 0;
     uint16_t TargetCore = 0;
     bool PendingTxReq = false;
-
+    
     for (std::list<Ptr<BusIfFIFO>>::iterator it1 = m_busIfFIFO.begin(); it1 != m_busIfFIFO.end(); it1++)
     {
       if ((*it1)->m_txMsgFIFO.IsEmpty() == false)
@@ -1479,7 +1461,7 @@ namespace ns3
           arrivalTime = txMsg.timestamp;
           TargetCore = core_idx;
         }
-        PendingTxReq = true;
+        PendingTxReq = true;      
       }
       core_idx++;
     }   
@@ -1518,47 +1500,45 @@ namespace ns3
 
   unsigned int BusArbiter::retrieveSharedCacheID(uint64_t id)
   {
-    if (id == 10)
-      return 0;
-    else if (id == 11)
-      return 1;
-    else if (id == 12)
-      return 2;
-    else if (id == 13)
-      return 3;
-    else if (id == 14)
-      return 4;
-    else if (id == 15)
-      return 5;
-    else if (id == 16)
-      return 6;
-    else if (id == 17)
-      return 7;    
+    if (id == 10) return 0;
+    else if (id == 11) return 1;
+    else if (id == 12) return 2;
+    else if (id == 13) return 3;
+    else if (id == 14) return 4;
+    else if (id == 15) return 5;
+    else if (id == 16) return 6;
+    else if (id == 17) return 7;  
+    else if (id == 18) return 8;
+    else if (id == 19) return 9;
+    else if (id == 20) return 10;
+    else if (id == 21) return 11;
+    else if (id == 22) return 12;
+    else if (id == 23) return 13;
+    else if (id == 24) return 14;
+    else if (id == 25) return 15;    
     cout << "retrieveSharedCacheID cannot find " << id << " as a Shared Cache ID" << endl;
     abort();
     return 0;
   }
 
   unsigned int BusArbiter::retrieveCacheFIFOID(uint64_t id)
-  {
-    if (id == 0)
-      return 10;
-    else if (id == 1)
-      return 11;
-    else if (id == 2)
-      return 12;
-    else if (id == 3)
-      return 13;
-    else if (id == 4)
-      return 14;
-    else if (id == 5)
-      return 15;
-    else if (id == 6)
-      return 16;
-    else if (id == 7)
-      return 17;
-    else if (id == 8)
-      return 18;    
+  {    
+    if(id == 0)      return 10;
+    else if(id == 1) return 11;
+    else if(id == 2) return 12;
+    else if(id == 3) return 13;
+    else if(id == 4) return 14;
+    else if(id == 5) return 15;
+    else if(id == 6) return 16;
+    else if(id == 7) return 17;
+    else if(id == 8) return 18;
+    else if(id == 9) return 19;
+    else if(id == 10) return 20;
+    else if(id == 11) return 21;
+    else if(id == 12) return 22;
+    else if(id == 13) return 23;
+    else if(id == 14) return 24;
+    else if(id == 15) return 25;  
     cout << "retrieveCacheFIFOID cannot find  " << id << " as Shared Cache FIFO ID" << endl;
     abort();
     return 0;
@@ -1683,10 +1663,6 @@ namespace ns3
 
     else {
 
-    
-
-
-
     /***   if in global oldest there is a msg whcih is not PutM that and its reqcoreID 
      *** equals to RR order requestor then go to the resp buffer and find it   ***/
     /*** if not go check the non oldest **/
@@ -1784,14 +1760,22 @@ namespace ns3
               itgReq = m_GlobalQueue->m_GlobalReqFIFO.GetFrontElement();
               //cout<<"checking id "<<itgReq.msgId<<" in the global FIFO"<<endl;
               m_GlobalQueue->m_GlobalReqFIFO.PopElement();
+              // if(((retrieveSharedBankCacheLine(m_ServQueueMsg.addr) == retrieveSharedBankCacheLine(itgReq.addr)) && (m_ServQueueMsg.sharedCacheAgent == itgReq.sharedCacheAgent) && 
+              //    (!isOldest(itgReq.addr,itgReq.reqCoreId)) && (itgReq.msgId != 0) && (itgReq.timestamp < m_ServQueueMsg.timestamp)) ||
+              //    ((retrieveSharedBankCacheLine(m_ServQueueMsg.addr) == retrieveSharedBankCacheLine(itgReq.addr)) && (m_ServQueueMsg.sharedCacheAgent == itgReq.sharedCacheAgent) && 
+              //    (!isOldest(itgReq.addr,itgReq.wbCoreId)) && (itgReq.msgId == 0) && (itgReq.timestamp < m_ServQueueMsg.timestamp)) ||
+              //    ((retrieveSharedBankCacheLine(m_ServQueueMsg.addr) == retrieveSharedBankCacheLine(itgReq.addr)) && (m_ServQueueMsg.sharedCacheAgent == itgReq.sharedCacheAgent) && 
+              //    (isOldest(itgReq.addr,itgReq.reqCoreId)) && (itgReq.msgId != 0) && (!isHigherPrio(itgReq.reqCoreId,m_ServQueueMsg.reqCoreId)) && (itgReq.timestamp < m_ServQueueMsg.timestamp)) ||
+              //    ((retrieveSharedBankCacheLine(m_ServQueueMsg.addr) == retrieveSharedBankCacheLine(itgReq.addr)) && (m_ServQueueMsg.sharedCacheAgent == itgReq.sharedCacheAgent) && 
+              //    (isOldest(itgReq.addr,itgReq.wbCoreId)) && (itgReq.msgId == 0)  && (!isHigherPrio(itgReq.wbCoreId,m_ServQueueMsg.reqCoreId)) && (itgReq.timestamp < m_ServQueueMsg.timestamp))) {
               if(((retrieveSharedBankCacheLine(m_ServQueueMsg.addr) == retrieveSharedBankCacheLine(itgReq.addr)) && (m_ServQueueMsg.sharedCacheAgent == itgReq.sharedCacheAgent) && 
-                 (!isOldest(itgReq.addr,itgReq.reqCoreId)) && (itgReq.msgId != 0) && (itgReq.timestamp < m_ServQueueMsg.timestamp)) ||
+                 (!isOldest(itgReq.addr,itgReq.reqCoreId)) && (itgReq.msgId != 0) ) ||
                  ((retrieveSharedBankCacheLine(m_ServQueueMsg.addr) == retrieveSharedBankCacheLine(itgReq.addr)) && (m_ServQueueMsg.sharedCacheAgent == itgReq.sharedCacheAgent) && 
-                 (!isOldest(itgReq.addr,itgReq.wbCoreId)) && (itgReq.msgId == 0) && (itgReq.timestamp < m_ServQueueMsg.timestamp)) ||
+                 (!isOldest(itgReq.addr,itgReq.wbCoreId)) && (itgReq.msgId == 0)) ||
                  ((retrieveSharedBankCacheLine(m_ServQueueMsg.addr) == retrieveSharedBankCacheLine(itgReq.addr)) && (m_ServQueueMsg.sharedCacheAgent == itgReq.sharedCacheAgent) && 
-                 (isOldest(itgReq.addr,itgReq.reqCoreId)) && (itgReq.msgId != 0) && (!isHigherPrio(itgReq.reqCoreId,m_ServQueueMsg.reqCoreId)) && (itgReq.timestamp < m_ServQueueMsg.timestamp)) ||
+                 (isOldest(itgReq.addr,itgReq.reqCoreId)) && (itgReq.msgId != 0) && (!isHigherPrio(itgReq.reqCoreId,m_ServQueueMsg.reqCoreId))) ||
                  ((retrieveSharedBankCacheLine(m_ServQueueMsg.addr) == retrieveSharedBankCacheLine(itgReq.addr)) && (m_ServQueueMsg.sharedCacheAgent == itgReq.sharedCacheAgent) && 
-                 (isOldest(itgReq.addr,itgReq.wbCoreId)) && (itgReq.msgId == 0)  && (!isHigherPrio(itgReq.wbCoreId,m_ServQueueMsg.reqCoreId)) && (itgReq.timestamp < m_ServQueueMsg.timestamp))) {
+                 (isOldest(itgReq.addr,itgReq.wbCoreId)) && (itgReq.msgId == 0)  && (!isHigherPrio(itgReq.wbCoreId,m_ServQueueMsg.reqCoreId)) )) {     
                 //cout<<"there is one request issued to same bank "<<m_ServQueueMsg.sharedCacheAgent<<" same cache line "<< retrieveSharedBankCacheLine(itgReq.addr)<<endl;   
                 // check the TX response buffer of the bank 
                 std::list<Ptr<BusIfFIFO>>::iterator itg1 = m_sharedCacheBusIfFIFO.begin();            
@@ -1863,11 +1847,6 @@ namespace ns3
                   }                   
                 }
 
-                                
-                      
-                
-                
-
                 m_GlobalQueue->m_GlobalReqFIFO.InsertElement(itgReq);
               }
               else {
@@ -1889,18 +1868,6 @@ namespace ns3
      //cout<<"11 "<<txResp.msgId<< "now we will scer priority reqID "<<txResp.reqCoreId<<" resp "<<txResp.respCoreId<<endl;
 
     
-
-
-
-
-
-
-
-
-
-
-
-
 
     // arbitrate the responses from cores 
     for (unsigned int RR_iterator = 0; RR_iterator < m_GlobalQueue->m_GlobalRRQueue.size() && PendingTxWBResp == false; RR_iterator++)
@@ -2160,7 +2127,6 @@ namespace ns3
     }
     else if(PendingTxWBResp == true && ChkOnly == false)
     {
-      //cout<<"2"<<endl;
       if (m_reza_log)
         cout << "The reqCore ID is  " << txResp.reqCoreId << "  and the respCoreID  " << txResp.respCoreId << " the address is " << txResp.addr << endl;
       if (m_logFileGenEnable)
@@ -2203,9 +2169,9 @@ namespace ns3
   {
 
 
+       
 
 
-    //cout<<"CheckPendingFCFSResp "<<endl;
     double arrivalTime = 0;
     uint16_t core_idx = 0;
     //uint16_t shared_idx   = 10;
@@ -2216,7 +2182,17 @@ namespace ns3
     BusIfFIFO::BusRespMsg issueTemp;
     unsigned int sharedCacheID;
 
-
+    if((ChkOnly && (m_delaycycle == 2)) || ((ChkOnly) && (m_arbiCycle == m_delaycyclereg))) {
+      //cout<<"m_delaycycle becomes 0 "<<endl;
+      m_delaycycle = 0;
+      return false;
+    }
+    if(!ChkOnly) {
+      if(m_delaycycle == 1) {        
+        m_delaycyclereg = m_arbiCycle;
+        m_delaycycle = 2;
+      }
+    }
     if(!ChkOnly) {
       issueTemp = txMsg;
       if(issueTemp.msgId == 0){
@@ -2281,48 +2257,106 @@ namespace ns3
 
 
     BusIfFIFO::BusRespMsg txMsgMem;
-    BusIfFIFO::BusRespMsg txMsgMem_temp;
+    for (std::list<Ptr<BusIfFIFO>>::iterator it1 = m_busIfFIFO.begin(); it1 != m_busIfFIFO.end(); it1++)
+    {
+      if ((*it1)->m_txRespFIFO.IsEmpty() == false)
+        {
+          if (m_reza_log) cout<<"Size of TX RESP of  "<<(*it1)->m_fifo_id<<" is "<<(*it1)->m_txRespFIFO.GetQueueSize()<<endl;
+        }
 
+    }
 
     if(ChkOnly) {
+      if (m_reza_log) cout<<"CheckPendingFCFSResp 1"<<endl;
       for (std::list<Ptr<BusIfFIFO>>::iterator it1 = m_busIfFIFO.begin(); it1 != m_busIfFIFO.end(); it1++)
       {
         if ((*it1)->m_txRespFIFO.IsEmpty() == false)
         {
           txMsg = (*it1)->m_txRespFIFO.GetFrontElement();
+          if (m_reza_log) cout<<m_arbiCycle<<" req "<<txMsg.reqCoreId<<"  resp  "<<txMsg.respCoreId<<"  the arrival is "<<txMsg.timestamp<<endl;
+          if((txMsg.msgId != 0 && txMsg.reqCoreId == 1) || (txMsg.msgId == 0 && txMsg.respCoreId == 1) 
+              || (txMsg.respCoreId < 10 && txMsg.reqCoreId < 10 && txMsg.respCoreId == 1)
+              || (txMsg.respCoreId < 10 && txMsg.reqCoreId < 10 && txMsg.reqCoreId == 1)) {
+            
+            
+            txMsg.timestamp = 0;
+          }
           if ((PendingTxReq == false) || arrivalTime > txMsg.timestamp)
           {
-            //cout<<"1 the address is "<<txMsg.addr<<"  and arrival is  "<<txMsg.timestamp<<endl;
-            //cout<<"CheckPendingFCFSResp 1"<<endl;
+            if (m_reza_log) cout<<"CheckPendingFCFSResp 2 "<<txMsg.timestamp<<endl;
             arrivalTime = txMsg.timestamp;
             TargetCore = core_idx;
           }
+          m_delaycycle = 1;
           PendingTxReq = true;
         }
         core_idx++;
       }
 
-      
+      if (m_reza_log) cout<<"CheckPendingFCFSResp 5"<<endl;
+
       for (std::list<Ptr<BusIfFIFO>>::iterator it2 = m_sharedCacheBusIfFIFO.begin(); it2 != m_sharedCacheBusIfFIFO.end(); it2++)
       {
+        //cout<<"------------------ check shared cache "<<(*it2)->m_fifo_id<<"  ------------------------"<<endl;
         if ((*it2)->m_txRespFIFO.IsEmpty() == false)
         {
-          txMsgMem_temp = (*it2)->m_txRespFIFO.GetFrontElement();
+          BusIfFIFO::BusRespMsg txMsgMem_temp;
+          BusIfFIFO::BusRespMsg txMsgMem_temp_1;
+          
+          
+
+          // in this queue, not always the front element is oldest.... perhaps somewhere the order is changed. Find the oldest one
+          
+          BusIfFIFO::BusRespMsg txMsgMem_temp_2;
+          if(!(*it2)->m_txRespFIFO.IsEmpty()){
+            for(int i = 0; i< (*it2)->m_txRespFIFO.GetQueueSize(); i++){
+               txMsgMem_temp_2 = (*it2)->m_txRespFIFO.GetFrontElement();
+               if((txMsgMem_temp_2.msgId != 0 && txMsgMem_temp_2.reqCoreId == 1) || (txMsgMem_temp_2.msgId == 0 && txMsgMem_temp_2.respCoreId == 1)){ 
+                  txMsgMem_temp_2.timestamp = 0;                
+               }
+               (*it2)->m_txRespFIFO.PopElement();
+               (*it2)->m_txRespFIFO.InsertElement(txMsgMem_temp_2);
+            } 
+          } 
+
+          txMsgMem_temp = (*it2)->m_txRespFIFO.GetFrontElement();          
+          //cout<<"  th seize "<<(*it2)->m_txRespFIFO.GetQueueSize()<<endl;
+          
+          if(!(*it2)->m_txRespFIFO.IsEmpty()){
+            for(int i = 0; i< (*it2)->m_txRespFIFO.GetQueueSize(); i++){
+              
+              txMsgMem_temp_1 = (*it2)->m_txRespFIFO.GetElement(i);
+              
+              
+              //cout<<" the msg ID "<<txMsgMem_temp_1.msgId<<"  arrival "<<txMsgMem_temp_1.timestamp<<endl;
+
+              if(txMsgMem_temp_1.timestamp < txMsgMem_temp.timestamp){
+                txMsgMem_temp = (*it2)->m_txRespFIFO.GetElement(i);
+              }                         
+            }
+          }
+          
+
+          
+          if (m_reza_log) cout<<"The oldest of "<<(*it2)->m_fifo_id<<"  has the address "<<txMsgMem_temp.addr<<"  and arrival is  "<<txMsgMem_temp.timestamp<<
+                  "  ID "<<txMsgMem_temp.msgId<<" from reqID "<<txMsgMem_temp.reqCoreId<<"  and resp ID "<<txMsgMem_temp.respCoreId<<endl;
+
           if ((PendingTxReq == false) || arrivalTime > txMsgMem_temp.timestamp)
           {
-          // cout<<"CheckPendingFCFSResp 2"<<endl;
+            if (m_reza_log) cout<<"Chosed"<<endl;
             txMsgMem = txMsgMem_temp;
             arrivalTime = txMsgMem.timestamp;
-            TargetCore = (*it2)->m_fifo_id;
-          // cout<<"2 the address is "<<txMsgMem.addr<<"  and arrival is  "<<txMsgMem.timestamp<<"  and the target core is "<<TargetCore<<endl;
+            TargetCore = (*it2)->m_fifo_id;            
           }
+          m_delaycycle = 1;
           PendingTxReq = true;
         }
       }
 
-      //cout<<"CheckPendingFCFSResp 3"<<endl;
+      if (m_reza_log) cout<<"CheckPendingFCFSResp 3"<<endl;
       if (TargetCore >= 10)
       {
+        if (m_reza_log) cout<<"CheckPendingFCFSResp 8"<<endl;
         txMsg = txMsgMem;
         // if (ChkOnly == false)
         // {
@@ -2334,7 +2368,7 @@ namespace ns3
       }
       else
       {
-       // cout<<"CheckPendingFCFSResp 5"<<endl;
+        if (m_reza_log) cout<<"CheckPendingFCFSResp 9"<<endl;
         //cout<<"here 1"<<endl;
         std::list<Ptr<BusIfFIFO>>::iterator it4 = m_busIfFIFO.begin();
         std::advance(it4, TargetCore);
@@ -2352,7 +2386,6 @@ namespace ns3
     {
       if (ChkOnly == false)
       {
-       // cout<<"CheckPendingFCFSResp 6"<<endl;
         if (m_logFileGenEnable)
         {
           if (TargetCore >= 10)
@@ -2364,9 +2397,7 @@ namespace ns3
             std::cout << "\nBusArbiter: Cpu " << TargetCore << " granted TDM response slot =============================================================== " << m_arbiCycle << "\n\n";
           }
         }
-        //cout<<"444 address "<<txMsg.addr<<"  shared agent "<<txMsg.sharedCacheAgent<<endl;
         SendData(txMsg, AGENT::CORE);
-        //cout<<"5555 address "<<txMsg.addr<<"  shared agent "<<txMsg.sharedCacheAgent <<"  reqID "<<txMsg.reqCoreId<<" dual "<<txMsg.dualTrans<<endl;
         if (txMsg.reqCoreId >= 10 || txMsg.dualTrans == true)
         {
           if (m_logFileGenEnable)
@@ -2477,6 +2508,11 @@ namespace ns3
               // if (m_reza_log)
               //   cout << "txResp from the oldest address  " << txResp.addr << "  agent " << txResp.sharedCacheAgent << "  reqCoreID " << txResp.reqCoreId << " wbcoreID " << txResp.wbCoreId << " msgID " << txResp.msgId << endl;
               //if ((txMsg.sharedCacheAgent == txResp.sharedCacheAgent && txMsg.reqCoreId == txResp.reqCoreId && txMsg.msgId != 0 && CheckOnly == true) || (txMsg.sharedCacheAgent == txResp.sharedCacheAgent && txMsg.wbCoreId == txResp.reqCoreId && txMsg.msgId == 0 && CheckOnly == true) || (txMsg.sharedCacheAgent == txResp.sharedCacheAgent && txMsg.reqCoreId == txResp.wbCoreId && txResp.msgId == 0 && CheckOnly == true) || (txMsg.sharedCacheAgent == txResp.sharedCacheAgent && txMsg.reqCoreId == txResp.reqCoreId && txMsg.wbCoreId == txResp.wbCoreId && txMsg.msgId == 0 && txResp.msgId == 0 && CheckOnly == true))
+
+              // if(existinTxResp(txResp)){
+
+              // }
+
               if ((txMsg.sharedCacheAgent == txResp.sharedCacheAgent && txMsg.msgId != 0 && CheckOnly == true) || 
                   (txMsg.sharedCacheAgent == txResp.sharedCacheAgent && txMsg.msgId == 0 && CheckOnly == true) || 
                   (txMsg.sharedCacheAgent == txResp.sharedCacheAgent && txMsg.reqCoreId == txResp.wbCoreId && txResp.msgId == 0 && CheckOnly == true) || 
@@ -2506,11 +2542,8 @@ namespace ns3
                 //   cout << "txResp from the oldest address  " << txResp.addr << "  agent " << txResp.sharedCacheAgent << "  reqCoreID " << txResp.reqCoreId << " wbcoreID " << txResp.wbCoreId << " msgID " << txResp.msgId << endl;
                 //if ((txMsg.sharedCacheAgent == txResp.sharedCacheAgent && txMsg.reqCoreId == txResp.reqCoreId && txMsg.msgId != 0 && CheckOnly == true) || (txMsg.sharedCacheAgent == txResp.sharedCacheAgent && txMsg.wbCoreId == txResp.reqCoreId && txMsg.msgId == 0 && CheckOnly == true) || (txMsg.sharedCacheAgent == txResp.sharedCacheAgent && txMsg.reqCoreId == txResp.wbCoreId && txResp.msgId == 0 && CheckOnly == true) || (txMsg.sharedCacheAgent == txResp.sharedCacheAgent && txMsg.reqCoreId == txResp.reqCoreId && txMsg.wbCoreId == txResp.wbCoreId && txMsg.msgId == 0 && txResp.msgId == 0 && CheckOnly == true))
                 if ((txMsg.sharedCacheAgent == txResp.sharedCacheAgent && txMsg.msgId != 0 && CheckOnly == true) || (txMsg.sharedCacheAgent == txResp.sharedCacheAgent && txMsg.msgId == 0 && CheckOnly == true) || (txMsg.sharedCacheAgent == txResp.sharedCacheAgent && txMsg.reqCoreId == txResp.wbCoreId && txResp.msgId == 0 && CheckOnly == true) || (txMsg.sharedCacheAgent == txResp.sharedCacheAgent && txMsg.reqCoreId == txResp.reqCoreId && txMsg.wbCoreId == txResp.wbCoreId && txMsg.msgId == 0 && txResp.msgId == 0 && CheckOnly == true))
-                { 
-                  /*************** NEEDS MODIFICATION SINCE NOW WE HAVE MORE BANKS! HENCE, WE SHOULD CHECK IF THAT RESPONSE IS FOR THAT SPECIFIC BANK OR NOT? CORRECT? ***************/
-                  PendingTxReq = false;
-                  // if (m_reza_log)
-                  //   cout << "It is false here so no scheduling" << endl;
+                {                   
+                  PendingTxReq = false;                
                 }
                 m_GlobalQueue->m_GlobalReqFIFO.InsertElement(txResp);
               }
@@ -2614,7 +2647,7 @@ namespace ns3
   void BusArbiter::RR_RT_ReqBus()
   {     
     /*** Request Bus Arbiter for the RT Controller ***/
-    /*
+    
     if (m_reza_log)
       if (m_PndReq == true)
         cout << "+||+||+||+||+||+||+||+||+||+||+||+||+||+||+||+||+||+||+||+||+||+||+||+||+||+||+||+||+||+||+||+||+||+||+||+||+||+||+||+||+||+||+||+||+||+||+||+||+||+||+||+||+||+||" << endl;
@@ -2648,10 +2681,14 @@ namespace ns3
       }
     }
 
-    */
+    
 
 
     bool next_arb_level = true;
+
+    /***********************************/
+
+
     // insert message on the request bus (broadcast)
     // in the slot, if there was a pending request chosen before, now its time to broadcast. and finally advance the TDM
     if (m_PndReq)
@@ -2719,7 +2756,9 @@ namespace ns3
       next_arb_level = false;
     } /* if a msg is picked at first level, there is no need for the second level of arbiteration. */
     //cout<<" In RR_RT_ReqBus Before Second Level"<<endl;
+   
     /********************* Second Level of Arbitration  ************************/
+     
     if (next_arb_level)
     {
       bool temp_PndReq = false;
@@ -2747,38 +2786,8 @@ namespace ns3
         }
       }
     }
+    
 
-    // if (m_reza_log)
-    //   cout << "-------------------------------REQ BUS ARBITER 22 ----------------------------------" << endl;
-
-    // if (m_reza_log)
-    //   cout << "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ Global Oldest Queue Contains the Following ++++++++++++++++++++++++++++++++++++++++++++++++++++++" << endl;
-    // if (m_reza_log)
-    // {
-    //   for (int u = 0; u < m_GlobalQueue->m_GlobalOldestQueue.GetQueueSize(); u++)
-    //   {
-    //     BusIfFIFO::BusReqMsg tempOldestReqMsgTemp;
-    //     tempOldestReqMsgTemp = m_GlobalQueue->m_GlobalOldestQueue.GetFrontElement();
-    //     m_GlobalQueue->m_GlobalOldestQueue.PopElement();
-    //     cout << "AT " << u << " ADDR " << tempOldestReqMsgTemp.addr << "  ReqID  " << tempOldestReqMsgTemp.reqCoreId << "  WBID  " << tempOldestReqMsgTemp.wbCoreId << "  MSGID " << tempOldestReqMsgTemp.msgId << "  AGENT  " << tempOldestReqMsgTemp.sharedCacheAgent << endl;
-    //     m_GlobalQueue->m_GlobalOldestQueue.InsertElement(tempOldestReqMsgTemp);
-    //   }
-    // }
-    // if (m_reza_log)
-    //   cout << "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ Global Service Queue Contains the Following ++++++++++++++++++++++++++++++++++++++++++++++++++++++" << endl;
-    // if (m_reza_log)
-    // {
-    //   for (int u = 0; u < m_GlobalQueue->m_GlobalReqFIFO.GetQueueSize(); u++)
-    //   {
-    //     BusIfFIFO::BusReqMsg tempNonOldestReqMsgTemp;
-    //     tempNonOldestReqMsgTemp = m_GlobalQueue->m_GlobalReqFIFO.GetFrontElement();
-    //     m_GlobalQueue->m_GlobalReqFIFO.PopElement();
-    //     if (m_reza_log)
-    //       cout << "AT " << u << " ADDR " << tempNonOldestReqMsgTemp.addr << "  ReqID  " << tempNonOldestReqMsgTemp.reqCoreId << "  WBID  " << tempNonOldestReqMsgTemp.wbCoreId << "  MSGID " << tempNonOldestReqMsgTemp.msgId << "  AGENT  " << tempNonOldestReqMsgTemp.sharedCacheAgent << endl;
-    //     m_GlobalQueue->m_GlobalReqFIFO.InsertElement(tempNonOldestReqMsgTemp);
-    //   }
-    // }
-    //cout<<" In RR_RT_ReqBus Before Scheduling the next transaction"<<endl;
     // wait one TDM Request slot, if there is any request
     if (m_PndReq)
     {
@@ -2856,11 +2865,24 @@ namespace ns3
           (replacement == true && tempOldestReqMsg.addr == adr && tempOldestReqMsg.wbCoreId == coreIndex))
       {
         //if (m_reza_log){
+
+          /*
           if(m_wcArbiter < m_arbiCycle - tempOldestReqMsg.becameOldest){
             m_wcArbiter = m_arbiCycle - tempOldestReqMsg.becameOldest;
           cout<<"                 Core The Oldest MsgID "<<tempOldestReqMsg.msgId<<" reQID "<<coreIndex<<" wbID "<<tempOldestReqMsg.wbCoreId<<" Terminated @ "<<m_arbiCycle<<" Arrival @ "<<tempOldestReqMsg.becameOldest<<" Latency: "<<
                 m_arbiCycle - tempOldestReqMsg.becameOldest<<"  The WC is "<<m_wcArbiter<<endl; 
+
           }
+          */
+
+          if(m_arbiCycle - tempOldestReqMsg.becameOldest > 80) {
+            if(m_arbiCycle - tempOldestReqMsg.becameOldest > 473)          
+              cout<<"473"<<endl;
+            else 
+              cout<<m_arbiCycle - tempOldestReqMsg.becameOldest<<endl;
+            
+          } 
+            
         //}
         // if(m_wcArbiter >= 180)
         //   abort();
@@ -3477,20 +3499,21 @@ namespace ns3
       {
           busArbiter->HPCycle++;
           if (busArbiter->m_reza_log)
-              cout << "---------------------------------------------------------------------------------------------------------------------------------------------- REQ Arbiter HP Mode" << endl;
+            cout << "---------------------------------------------------------------------------------------------------------------------------------------------- REQ Arbiter HP Mode" << endl;
           if (busArbiter->arb_req_mode == "RT")
           {
               busArbiter->SwitchRTHP++;
               busArbiter->m_PndReq = false;
-              if (busArbiter->m_reza_log) cout << "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  switch from RT to HP  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%" << endl;
+              if (busArbiter->m_reza_log) 
+                cout << "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  switch from RT to HP  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%" << endl;
           }
           busArbiter->arb_req_mode = "HP";
           if (busArbiter->m_reza_log)
               cout << "---------------------------------------------------------------------------------------------------------------------------------------------- RESP Arbiter HP Mode" << endl;
           if (busArbiter->arb_resp_mode == "RT")
           {
-              //busArbiter->m_PndResp = false;
-              if (busArbiter->m_reza_log) cout << "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  switch from RT to HP  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"<<endl;
+              if (busArbiter->m_reza_log) 
+                cout << "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  switch from RT to HP  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"<<endl;
           }
           busArbiter->arb_resp_mode = "HP";
       }
@@ -3503,7 +3526,8 @@ namespace ns3
           {
               busArbiter->SwitchHPRT++;
               busArbiter->m_PndReq = false;
-              if (busArbiter->m_reza_log) cout << "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  switch from HP to RT  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%" << endl;
+              if (busArbiter->m_reza_log) 
+                cout << "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  switch from HP to RT  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%" << endl;
           }
           busArbiter->arb_req_mode = "RT";
 
@@ -3511,8 +3535,8 @@ namespace ns3
               cout << "---------------------------------------------------------------------------------------------------------------------------------------------- RESP Arbiter RT Mode " << endl;
           if (busArbiter->arb_resp_mode == "HP")
           {
-              //busArbiter->m_PndResp = false;
-              if (busArbiter->m_reza_log) cout << "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  switch from HP to RT  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%" << endl;
+              if (busArbiter->m_reza_log) 
+                cout << "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  switch from HP to RT  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%" << endl;
           }
           busArbiter->arb_resp_mode = "RT";
       }
@@ -3522,7 +3546,8 @@ namespace ns3
   //^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^REWIEWD^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^//
   void BusArbiter::CycleAdvance()
   {
-    if (m_reza_log) cout << "In BusArbiter::CycleAdvance   " << m_arbiCycle <<" REQ Bus Blocked "<<m_GlobalQueue->m_busArbBlock<<" RESPONSE Bus Blocked "<<m_GlobalQueue->m_respArbBlock<< endl; 
+    if (m_reza_log) 
+      cout << "In BusArbiter::CycleAdvance   " << m_arbiCycle <<" REQ Bus Blocked "<<m_GlobalQueue->m_busArbBlock<<" RESPONSE Bus Blocked "<<m_GlobalQueue->m_respArbBlock<< endl; 
     if (m_reza_log) {
       for (std::list<Ptr<BusIfFIFO>>::iterator it13 = m_sharedCacheBusIfFIFO.begin(); it13 != m_sharedCacheBusIfFIFO.end(); it13++)
       {
@@ -3545,7 +3570,7 @@ namespace ns3
 
     m_arbiCycle++;
 
-    if (m_arbiCycle % 10000 == 0){  
+    if (m_arbiCycle % 100000000 == 0){  
       cout <<"********************************************************************************************************************************************************"<<endl;
       cout <<"********************************************************************************************************************************************************"<<endl;    
       cout <<"HeartBeat     :: "<<m_arbiCycle <<" C2C Transfer :: "<<m_GlobalQueue->m_Core2CoreTransfer<<endl;
@@ -3589,10 +3614,10 @@ namespace ns3
     }
     if (m_reza_log)
       cout << "-----------------------------------------------------------------CLOCK: " << m_arbiCycle << "----------------------------------------------------------" << endl;
-    //  if(m_arbiCycle > 40000 )
+    // if(m_arbiCycle > 33000 )
     //    m_reza_log = true;
-    if(m_arbiCycle == 100000)
-      abort();
+    // if(m_arbiCycle == 10000)
+    //   abort();
      
 
     Simulator::Schedule(NanoSeconds(m_dt), &BusArbiter::Step, Ptr<BusArbiter>(this));

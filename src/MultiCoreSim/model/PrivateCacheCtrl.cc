@@ -167,9 +167,9 @@ namespace ns3 {
       unsigned int WCL_0;
       unsigned int WCL_1;
       unsigned int WCL_2;
-      WCL_0 = 413;
-      WCL_1 = 413;
-      WCL_2 = 413; 
+      WCL_0 = 473;
+      WCL_1 = 473;
+      WCL_2 = 473; 
       if(msg.orderDetermined) {
         //cout<<"determined become "<<msg.becameOldest<<endl;
         //cout<<"before deadline assigned "<<msg.associateDeadline<<endl;
@@ -210,6 +210,14 @@ namespace ns3 {
       else if(id == 5) return 15;
       else if(id == 6) return 16;
       else if(id == 7) return 17;
+      else if(id == 8) return 18;
+      else if(id == 9) return 19;
+      else if(id == 10) return 20;
+      else if(id == 11) return 21;
+      else if(id == 12) return 22;
+      else if(id == 13) return 23;
+      else if(id == 14) return 24;
+      else if(id == 15) return 25;
       cout<<"retrieveCacheFIFOID cannot find  "<<id<<" as Shared Cache FIFO ID"<<endl;
       abort();
       return 0;
@@ -268,7 +276,8 @@ namespace ns3 {
        tempBusReqMsg.NoGetMResp   = NoGetMResp;
        bool m_replacement         = false;         
       /**************** VERY IMPORTANT:: IF THE MSGid IS ZERO, IT MEANS THAT THIS TRANSACTION IS A REPLACEMENT ********************/
-       
+       if((tempBusReqMsg.msgId != 0 && tempBusReqMsg.reqCoreId == 1) || (tempBusReqMsg.msgId == 0 && tempBusReqMsg.wbCoreId == 1)) tempBusReqMsg.timestamp = 0;
+
        if (!m_busIfFIFO->m_txMsgFIFO.IsFull() && PendingWbBuf == false) {
          if(!m_duetto && m_mode == "FCFS") {
             m_busIfFIFO->m_txMsgFIFO.InsertElement(tempBusReqMsg);
@@ -434,6 +443,7 @@ namespace ns3 {
          wbMsg.cycle        = m_cacheCycle;
          wbMsg.msgId        = msgId;
          wbMsg.dualTrans    = dualTrans;
+         if((wbMsg.msgId != 0 && wbMsg.reqCoreId == 1) || (wbMsg.msgId == 0 && wbMsg.respCoreId == 1)) wbMsg.timestamp = 0;
          if (m_logFileGenEnable) {
            std::cout << "DoWriteBack:: coreId = " << m_coreId << " requested Core = " << wbCoreId <<"  dual: "<<dualTrans<< std::endl;
          }
@@ -761,7 +771,7 @@ namespace ns3 {
                  if (!DoWriteBack (busRespMsg.addr, busRespMsg.sharedCacheAgent, busRespMsg.msgId, false)) {
                    //cout<<"11############################33  "<<busRespMsg.sharedCacheAgent<<"   previous  "<<m_sharedMemId<<endl;
                    //if (!DoWriteBack (busRespMsg.addr, busRespMsg.sharedCacheAgent, busRespMsg.msgId, false)) {
-                   std::cout << "This is will cause stall in the PMSI state machine !!!!" << std::endl;
+                   std::cout << "3This is will cause stall in the PMSI state machine !!!!" << std::endl;
                    exit(0);
                  }
                }
@@ -1023,8 +1033,8 @@ namespace ns3 {
              }
            }
 
-           // Remove message from the busReq buffer
-           m_busIfFIFO->m_rxMsgFIFO.PopElement();
+          // // Remove message from the busReq buffer
+          // m_busIfFIFO->m_rxMsgFIFO.PopElement();
 
            // Do write back  -- m_sharedMemId
            uint16_t reqCoreId = (currEventCtrlAction ==  SNOOPPrivCtrlAction::SendCoreOnly || 
@@ -1035,8 +1045,12 @@ namespace ns3 {
           //    abort();
           //  }
            if (!DoWriteBack (busReqMsg.addr, reqCoreId, busReqMsg.msgId, dualTrans)) {
-             std::cout << "This is will cause stall in the PMSI state machine !!!!" << std::endl;
-             exit(0);
+             std::cout << "2This is will cause stall in the PMSI state machine !!!!" << std::endl;
+             //exit(0);
+           }
+           else{
+              // Remove message from the busReq buffer
+              m_busIfFIFO->m_rxMsgFIFO.PopElement();
            }
            
            if (m_pType == CohProtType::SNOOP_MOESI && m_cohProtocol->GetBusReqEvent () == SNOOPPrivReqBusEvent::OtherGetM) {
@@ -1062,7 +1076,7 @@ namespace ns3 {
            //uint16_t reqCoreId = (m_cohProtocol->GetBusReqEvent () == SNOOPPrivReqBusEvent::OwnInvTrans) ? m_sharedMemId : busReqMsg.reqCoreId;
            uint16_t reqCoreId = (m_cohProtocol->GetBusReqEvent () == SNOOPPrivReqBusEvent::OwnInvTrans) ? busReqMsg.sharedCacheAgent : busReqMsg.reqCoreId;
            if (!PushMsgInBusTxFIFO (busReqMsg.msgId, reqCoreId, m_coreId, currEventCohrTrans, busReqMsg.addr, busReqMsg.sharedCacheAgent, false)) {
-             std::cout << "This is will cause stall in the PMSI state machine !!!!" << std::endl;
+             std::cout << "1This is will cause stall in the PMSI state machine !!!!" << std::endl;
              exit(0);
            }
            if (currEventCtrlAction == SNOOPPrivCtrlAction::issueTransSaveWbId) {
@@ -1176,7 +1190,7 @@ namespace ns3 {
      } // PrivateCacheCtrl::CacheCtrlMain ()
 
     void PrivateCacheCtrl::CycleProcess() {
-      // if(m_cacheCycle > 35000 ){
+      // if(m_cacheCycle > 5500 ){
       //    m_reza_log_private = true;
       //  }
      // cout<<"PrivateCacheCtrl  CycleProcess  "<<endl;

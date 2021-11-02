@@ -118,9 +118,9 @@ namespace ns3 {
       unsigned int WCL_0;
       unsigned int WCL_1;
       unsigned int WCL_2;
-      WCL_0 = 413;
-      WCL_1 = 413;
-      WCL_2 = 413;       
+      WCL_0 = 473;
+      WCL_1 = 473;
+      WCL_2 = 473;       
       //cout<<"become oldest "<<msg.becameOldest<<endl;
       if(msg.orderDetermined) {
         switch (msg.orderofArbitration) {
@@ -783,11 +783,15 @@ namespace ns3 {
        bool TxReqMsgInsertFlag    = false;
        bool TxRespMsgInsertFlag   = false;
        
+       if((tempBusReqMsg.msgId != 0 && tempBusReqMsg.reqCoreId == 1) || (tempBusReqMsg.msgId == 0 && tempBusReqMsg.wbCoreId == 1)) tempBusReqMsg.timestamp = 0;
        
        if (type == CoreInv || type == DataPlsExcl || type == ExclOnly) {
          if (!m_busIfFIFO->m_txMsgFIFO.IsFull()) {
            m_busIfFIFO->m_txMsgFIFO.InsertElement(tempBusReqMsg);
            TxReqMsgInsertFlag = true;
+         }
+         else{
+           cout<<"interface full"<<endl;
          }
        }
        else {
@@ -817,6 +821,19 @@ namespace ns3 {
            m_busIfFIFO->m_localPendingRespTxBuffer.InsertElement(wbMsg);
            TxRespMsgInsertFlag = true;
          }
+         else{
+           //cout<<"m_localPendingRespTxBuffer  full  "<<m_busIfFIFO->m_localPendingRespTxBuffer.GetQueueSize()<<endl;
+            if (!m_busIfFIFO->m_localPendingRespTxBuffer.IsEmpty()) { 
+           cout<<"Size of the m_localPendingRespTxBuffer is "<<m_busIfFIFO->m_localPendingRespTxBuffer.GetQueueSize()<<" front address is "<<m_busIfFIFO->m_localPendingRespTxBuffer.GetFrontElement().addr<<endl;
+            ns3::BusIfFIFO::BusRespMsg busResp_temp_1;         
+            for(int itr1= 0 ; itr1 < m_busIfFIFO->m_localPendingRespTxBuffer.GetQueueSize(); itr1++) {
+              busResp_temp_1 = m_busIfFIFO->m_localPendingRespTxBuffer.GetFrontElement();           
+              m_busIfFIFO->m_localPendingRespTxBuffer.PopElement();
+                 cout<<"Address: "<<busResp_temp_1.addr<<" reqCoreID "<<busResp_temp_1.reqCoreId<<"  respCoreID  "<<busResp_temp_1.respCoreId<<"  msgID is  "<<busResp_temp_1.msgId<<endl;           
+              m_busIfFIFO->m_localPendingRespTxBuffer.InsertElement(busResp_temp_1);
+            }
+          }
+         }
          //}
          
          if (m_logFileGenEnable) {
@@ -842,6 +859,8 @@ namespace ns3 {
          tempBusReqMsg.wbCoreId     = wbCoreId;
          tempBusReqMsg.addr         = addr;
          tempBusReqMsg.timestamp    = m_cacheCycle*m_dt;
+
+         if((tempBusReqMsg.msgId != 0 && tempBusReqMsg.reqCoreId == 1) || (tempBusReqMsg.msgId == 0 && tempBusReqMsg.wbCoreId == 1)) tempBusReqMsg.timestamp = 0;
          // push message into BusTxMsg FIFO
          m_PndWBFIFO.InsertElement(tempBusReqMsg);
          return true;
@@ -1116,11 +1135,23 @@ namespace ns3 {
         m_GlobalQueue->m_GlobalOldestQueue.PopElement();
         if(tempOldestReqMsg.addr == adr && tempOldestReqMsg.reqCoreId == coreIndex && tempOldestReqMsg.msgId == ID) {          
          // if(m_reza_log_shared) {
+           /*
             if(m_wcShared < m_cacheCycle - tempOldestReqMsg.becameOldest + m_sharedcachelatency){
               m_wcShared = m_cacheCycle - tempOldestReqMsg.becameOldest + m_sharedcachelatency;
              cout<<"The Oldest MsgID "<<tempOldestReqMsg.msgId<<" From "<<coreIndex<<" Terminated @ "<<m_cacheCycle<<" Arrival @ "<< tempOldestReqMsg.becameOldest <<" In the Bank: "<<m_coreId<<" Latency: "<<
                 m_cacheCycle - tempOldestReqMsg.becameOldest + m_sharedcachelatency<<" The WC is "<<m_wcShared <<endl; 
             }
+            */
+           if(m_cacheCycle - tempOldestReqMsg.becameOldest > 80) {
+            if(m_cacheCycle - tempOldestReqMsg.becameOldest > 473)           
+              cout<<"413"<<endl;
+            else 
+              cout<<m_cacheCycle - tempOldestReqMsg.becameOldest<<endl;
+            
+          } 
+
+            // if(m_cacheCycle - tempOldestReqMsg.becameOldest > 80) 
+            //   cout<<m_cacheCycle - tempOldestReqMsg.becameOldest<<endl;
           //}
             
           if(m_reza_log_shared) cout<<"removeFromOldest done "<<tempOldestReqMsg.addr<<" "<<tempOldestReqMsg.msgId<<endl;
@@ -2443,9 +2474,9 @@ namespace ns3 {
     
     void SharedCacheCtrl::CycleProcess() {
       if(m_reza_log_shared) cout<<"Shared Cache Controller Cycle Process"<<endl;
-      // if(m_cacheCycle > 35000 ){
+      // if(m_cacheCycle > 33000 ){
       //    m_reza_log_shared = true;
-       //}
+      //  }
        CacheCtrlMain();
       // Schedule the next run
       if (m_duetto)

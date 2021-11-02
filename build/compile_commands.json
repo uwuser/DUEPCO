@@ -1,7 +1,7 @@
 [
   {
-    "directory": "/home/rmirosan/Dropbox/Papers/RTSS2021/dev-duetto/build",
-    "command": "/usr/bin/g++ -O0 -ggdb -g3 -Wall -Werror -std=c++11 -fPIC -pthread -I. -I.. -DNS3_BUILD_PROFILE_DEBUG -DNS3_ASSERT_ENABLE -DNS3_LOG_ENABLE ../src/MultiCoreSim/model/MCoreSimProject.cc -c -o/home/rmirosan/Dropbox/Papers/RTSS2021/dev-duetto/build/src/MultiCoreSim/model/MCoreSimProject.cc.1.o",
+    "directory": "/home/rmirosan/Dropbox/Papers/RTSS2021/speed-Duetto/dev-duetto0/build",
+    "command": "/usr/bin/g++ -O0 -ggdb -g3 -Wall -Werror -std=c++11 -fPIC -pthread -I. -I.. -DNS3_BUILD_PROFILE_DEBUG -DNS3_ASSERT_ENABLE -DNS3_LOG_ENABLE ../src/MultiCoreSim/model/MCoreSimProject.cc -c -o/home/rmirosan/Dropbox/Papers/RTSS2021/speed-Duetto/dev-duetto0/build/src/MultiCoreSim/model/MCoreSimProject.cc.1.o",
     "file": "../src/MultiCoreSim/model/MCoreSimProject.cc"
   },
   {
@@ -15,18 +15,18 @@
     "file": "../scratch/MultiCoreSimulator.cc"
   },
   {
-    "directory": "/home/rmirosan/Dropbox/Papers/RTSS2021/dev-duetto/build",
-    "command": "/usr/bin/g++ -O0 -ggdb -g3 -Wall -Werror -std=c++11 -fPIC -pthread -I. -I.. -DNS3_BUILD_PROFILE_DEBUG -DNS3_ASSERT_ENABLE -DNS3_LOG_ENABLE ../src/MultiCoreSim/model/BusArbiter.cc -c -o/home/rmirosan/Dropbox/Papers/RTSS2021/dev-duetto/build/src/MultiCoreSim/model/BusArbiter.cc.1.o",
+    "directory": "/home/rmirosan/Dropbox/Papers/RTSS2021/speed-Duetto/dev-duetto0/build",
+    "command": "/usr/bin/g++ -O0 -ggdb -g3 -Wall -Werror -std=c++11 -fPIC -pthread -I. -I.. -DNS3_BUILD_PROFILE_DEBUG -DNS3_ASSERT_ENABLE -DNS3_LOG_ENABLE ../src/MultiCoreSim/model/BusArbiter.cc -c -o/home/rmirosan/Dropbox/Papers/RTSS2021/speed-Duetto/dev-duetto0/build/src/MultiCoreSim/model/BusArbiter.cc.1.o",
     "file": "../src/MultiCoreSim/model/BusArbiter.cc"
   },
   {
-    "directory": "/home/rmirosan/Dropbox/Papers/RTSS2021/dev-duetto/build",
-    "command": "/usr/bin/g++ -O0 -ggdb -g3 -Wall -Werror -std=c++11 -fPIC -pthread -I. -I.. -DNS3_BUILD_PROFILE_DEBUG -DNS3_ASSERT_ENABLE -DNS3_LOG_ENABLE ../src/MultiCoreSim/model/PrivateCacheCtrl.cc -c -o/home/rmirosan/Dropbox/Papers/RTSS2021/dev-duetto/build/src/MultiCoreSim/model/PrivateCacheCtrl.cc.1.o",
+    "directory": "/home/rmirosan/Dropbox/Papers/RTSS2021/speed-Duetto/dev-duetto0/build",
+    "command": "/usr/bin/g++ -O0 -ggdb -g3 -Wall -Werror -std=c++11 -fPIC -pthread -I. -I.. -DNS3_BUILD_PROFILE_DEBUG -DNS3_ASSERT_ENABLE -DNS3_LOG_ENABLE ../src/MultiCoreSim/model/PrivateCacheCtrl.cc -c -o/home/rmirosan/Dropbox/Papers/RTSS2021/speed-Duetto/dev-duetto0/build/src/MultiCoreSim/model/PrivateCacheCtrl.cc.1.o",
     "file": "../src/MultiCoreSim/model/PrivateCacheCtrl.cc"
   },
   {
-    "directory": "/home/rmirosan/Dropbox/Papers/RTSS2021/dev-duetto/build",
-    "command": "/usr/bin/g++ -O0 -ggdb -g3 -Wall -Werror -std=c++11 -fPIC -pthread -I. -I.. -DNS3_BUILD_PROFILE_DEBUG -DNS3_ASSERT_ENABLE -DNS3_LOG_ENABLE ../src/MultiCoreSim/model/SharedCacheCtrl.cc -c -o/home/rmirosan/Dropbox/Papers/RTSS2021/dev-duetto/build/src/MultiCoreSim/model/SharedCacheCtrl.cc.1.o",
+    "directory": "/home/rmirosan/Dropbox/Papers/RTSS2021/speed-Duetto/dev-duetto0/build",
+    "command": "/usr/bin/g++ -O0 -ggdb -g3 -Wall -Werror -std=c++11 -fPIC -pthread -I. -I.. -DNS3_BUILD_PROFILE_DEBUG -DNS3_ASSERT_ENABLE -DNS3_LOG_ENABLE ../src/MultiCoreSim/model/SharedCacheCtrl.cc -c -o/home/rmirosan/Dropbox/Papers/RTSS2021/speed-Duetto/dev-duetto0/build/src/MultiCoreSim/model/SharedCacheCtrl.cc.1.o",
     "file": "../src/MultiCoreSim/model/SharedCacheCtrl.cc"
   },
   {
@@ -40,8 +40,8 @@
     "file": "../src/MultiCoreSim/model/LatencyLogger.cc"
   },
   {
-    "directory": "/home/rmirosan/Dropbox/Papers/RTSS2021/dev-duetto/build",
-    "command": "/usr/bin/g++ -O0 -ggdb -g3 -Wall -Werror -std=c++11 -fPIC -pthread -I. -I.. -DNS3_BUILD_PROFILE_DEBUG -DNS3_ASSERT_ENABLE -DNS3_LOG_ENABLE ../src/MultiCoreSim/model/CpuCoreGenerator.cc -c -o/home/rmirosan/Dropbox/Papers/RTSS2021/dev-duetto/build/src/MultiCoreSim/model/CpuCoreGenerator.cc.1.o",
+    "directory": "/home/rmirosan/Dropbox/Papers/RTSS2021/speed-Duetto/dev-duetto0/build",
+    "command": "/usr/bin/g++ -O0 -ggdb -g3 -Wall -Werror -std=c++11 -fPIC -pthread -I. -I.. -DNS3_BUILD_PROFILE_DEBUG -DNS3_ASSERT_ENABLE -DNS3_LOG_ENABLE ../src/MultiCoreSim/model/CpuCoreGenerator.cc -c -o/home/rmirosan/Dropbox/Papers/RTSS2021/speed-Duetto/dev-duetto0/build/src/MultiCoreSim/model/CpuCoreGenerator.cc.1.o",
     "file": "../src/MultiCoreSim/model/CpuCoreGenerator.cc"
   },
   {

@@ -77,6 +77,14 @@ namespace ns3 {
       else if(id == 5) return 15;
       else if(id == 6) return 16;
       else if(id == 7) return 17;
+      else if(id == 8) return 18;
+      else if(id == 9) return 19;
+      else if(id == 10) return 20;
+      else if(id == 11) return 21;
+      else if(id == 12) return 22;
+      else if(id == 13) return 23;
+      else if(id == 14) return 24;
+      else if(id == 15) return 25;
       cout<<"retrieveCacheFIFOID cannot find  "<<id<<" as Shared Cache FIFO ID"<<endl;
       abort();
       return 0;
@@ -220,6 +228,7 @@ namespace ns3 {
         if (m_cpuReqDone == true && m_cpuRespCnt >= m_cpuReqCnt) {
           m_cpuCoreSimDone = true;
           std::cout << "Cpu " << m_coreId << " Simulation End @ processor cycle # " << m_cpuCycle <<"  Core2Core Transfers "<< m_GlobalQueue->m_Core2CoreTransfer << " Bank2Core Transfers "<<m_GlobalQueue->m_SharedBankTransfer<< std::endl;
+          abort();
         }
         else {
           // Schedule the next run

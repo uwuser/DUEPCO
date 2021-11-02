@@ -99,7 +99,7 @@ cout<<"----------------------------------------------------Start Setting Configu
      newBusIfFIFO->m_txMsgFIFO.SetFifoDepth  (projectXmlCfg.GetBusFIFOSize()); 
      newBusIfFIFO->m_txRespFIFO.SetFifoDepth (projectXmlCfg.GetBusFIFOSize()); 
      newBusIfFIFO->m_rxMsgFIFO.SetFifoDepth  (projectXmlCfg.GetBusFIFOSize()); 
-     newBusIfFIFO->m_rxRespFIFO.SetFifoDepth (projectXmlCfg.GetBusFIFOSize()); 
+     newBusIfFIFO->m_rxRespFIFO.SetFifoDepth (projectXmlCfg.GetBusFIFOSize());      
      m_busIfFIFO.push_back                   (newBusIfFIFO                  );
 
      /*
@@ -161,7 +161,7 @@ cout<<"----------------------------------------------------Start Setting Configu
     newsharedCacheBusIfFIFO->m_txRespFIFO.SetFifoDepth (projectXmlCfg.GetBusFIFOSize());             // Modified to Accomodate Multi Shared Cache
     newsharedCacheBusIfFIFO->m_rxMsgFIFO.SetFifoDepth  (projectXmlCfg.GetBusFIFOSize());             // Modified to Accomodate Multi Shared Cache
     newsharedCacheBusIfFIFO->m_rxRespFIFO.SetFifoDepth (projectXmlCfg.GetBusFIFOSize());             // Modified to Accomodate Multi Shared Cache
-    newsharedCacheBusIfFIFO->m_localPendingRespTxBuffer.SetFifoDepth (projectXmlCfg.GetBusFIFOSize());
+    newsharedCacheBusIfFIFO->m_localPendingRespTxBuffer.SetFifoDepth (1000);
     m_sharedCacheBusIfFIFO.push_back                   (newsharedCacheBusIfFIFO);
 
   /* 
