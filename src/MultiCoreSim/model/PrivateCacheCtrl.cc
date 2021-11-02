@@ -190,9 +190,10 @@ namespace ns3
     unsigned int WCL_0;
     unsigned int WCL_1;
     unsigned int WCL_2;
-    WCL_0 = 473;
-    WCL_1 = 473;
-    WCL_2 = 473;
+    // chose the bounds based on the types
+    WCL_0 = 8888;
+    WCL_1 = 8888;
+    WCL_2 = 8888;
     if (msg.orderDetermined)
     {
       switch (msg.orderofArbitration)
