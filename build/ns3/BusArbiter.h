@@ -111,10 +111,6 @@ namespace ns3 {
     BusIfFIFO::BusRespMsg m_PendWBMsg;
     BusIfFIFO::BusRespMsg m_PendResp;
 
-    // service queue                                            // Modified to Accomodate Multi Shared Cache
-    // GenericDeque <BusIfFIFO::BusReqMsg> m_GlobalReqFIFO;       // Modified to Accomodate Multi Shared Cache
-
-    
     // pointer to global queue
     ns3::Ptr<ns3::GlobalQueue> m_GlobalQueue;         // Modified to Accomodate Multi Shared Cache
 
@@ -189,20 +185,6 @@ namespace ns3 {
 
     bool FcFsWriteBackCheckInsert (uint16_t core_idx, uint64_t addr, bool CheckOnly, BusIfFIFO::BusRespMsg & txResp);
 
-   // void PMSI_TDM_ReqBus();
-
-    //void PMSI_OOO_TDM_ReqBus();
-
-    //void PMSI_FcFsRespBus();
-
-    //void PISCOT_MSI_TDM_ReqBus(); 
-
-    //void PISCOT_OOO_MSI_TDM_ReqBus();
-
-    //void MSI_FcFsReqBus();
-
-    //void PISCOT_MSI_FcFsResBus();
-
     bool CheckPendingFCFSReq (BusIfFIFO::BusReqMsg & txMsg, bool ChkOnly); 
     
     bool CheckPendingFCFSResp (BusIfFIFO::BusRespMsg & txMsg, bool ChkOnly);
@@ -210,27 +192,10 @@ namespace ns3 {
     void MSI_FcFsRespBus();
     
     void MSI_FcFsReqBus();
-    
-    //void Unified_TDM_PMSI_Bus ();
-    
-    //void Unified_TDM_PMSI_Bus2 ();
 
     void RR_RT_ReqBus();
 
     void RR_RT_RespBus();
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
   public:

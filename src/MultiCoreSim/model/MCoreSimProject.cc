@@ -19,7 +19,6 @@ using namespace ns3;
  */
 
 MCoreSimProject::MCoreSimProject(MCoreSimProjectXml projectXmlCfg) {
-cout<<"----------------------------------------------------Start Setting Configurations ----------------------------------------------------"<<endl;
   // Set the project xml
   m_projectXmlCfg = projectXmlCfg;
 
@@ -369,7 +368,7 @@ cout<<"----------------------------------------------------Start Setting Configu
      }
             
   }
-  cout<<"----------------------------------------------------Finish Setting Configurations ----------------------------------------------------"<<endl;   
+  
 }
 
 /* 
@@ -451,7 +450,7 @@ void MCoreSimProject::EnableDebugFlag(bool Enable) {
 void MCoreSimProject::GetCohrProtocolType () {
   
   string cohType = m_projectXmlCfg.GetCohrProtType();
-  cout<<"in get protcol  "<<cohType<<endl;
+  
   if      ( cohType == "MSI"  ) {m_cohrProt = CohProtType::SNOOP_MSI;}
   else if ( cohType == "MESI" ) {m_cohrProt = CohProtType::SNOOP_MESI;}
   else if ( cohType == "MOESI") {m_cohrProt = CohProtType::SNOOP_MOESI;}

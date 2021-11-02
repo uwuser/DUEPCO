@@ -1,0 +1,166 @@
+Waf: Entering directory `/home/rmirosan/Dropbox/Papers/RTSS2021/dev-duetto-git/build'
+[  1/209] Compiling install-ns3-header: ns3/SharedCacheCtrl.h
+[  2/209] Compiling install-ns3-header: ns3/CpuCoreGenerator.h
+[  3/209] Compiling install-ns3-header: ns3/MCoreSimProject.h
+[  4/209] Compiling install-ns3-header: ns3/LatencyLogger.h
+[  5/209] Compiling install-ns3-header: ns3/CohProtocolCommon.h
+[  6/209] Compiling install-ns3-header: ns3/MESI.h
+[  7/209] Compiling install-ns3-header: ns3/PMSI.h
+[  8/209] Compiling install-ns3-header: ns3/L1BusCnfgXml.h
+[  9/209] Compiling install-ns3-header: ns3/IdGenerator.h
+[ 10/209] Compiling install-ns3-header: ns3/PrivateCacheCtrl.h
+[ 11/209] Compiling install-ns3-header: ns3/CacheXml.h
+[ 12/209] Compiling install-ns3-header: ns3/MCoreSimProjectXml.h
+[ 13/209] Compiling install-ns3-header: ns3/tinyxml.h
+[ 14/209] Compiling install-ns3-header: ns3/GenericCache.h
+[ 15/209] Compiling install-ns3-header: ns3/BusArbiter.h
+[ 16/209] Compiling install-ns3-header: ns3/MemTemplate.h
+[ 17/209] Compiling install-ns3-header: ns3/IFCohProtocol.h
+[ 18/209] Compiling install-ns3-header: ns3/tinystr.h
+[ 19/209] Compiling install-ns3-header: ns3/SNOOPProtocolCommon.h
+[ 20/209] Compiling install-ns3-header: ns3/SNOOPPrivCohProtocol.h
+[ 21/209] Compiling install-ns3-header: ns3/MSI.h
+[ 22/209] Compiling install-ns3-header: ns3/DRAMCtrl.h
+[ 23/209] Compiling install-ns3-header: ns3/MOESI.h
+[ 24/209] Compiling install-ns3-header: ns3/traced-value.h
+[ 25/209] Compiling install-ns3-header: ns3/non-copyable.h
+[ 26/209] Compiling install-ns3-header: ns3/command-line.h
+[ 27/209] Compiling install-ns3-header: ns3/build-profile.h
+[ 28/209] Compiling install-ns3-header: ns3/object-base.h
+[ 29/209] Compiling install-ns3-header: ns3/traced-callback.h
+[ 30/209] Compiling install-ns3-header: ns3/hash-function.h
+[ 31/209] Compiling install-ns3-header: ns3/int64x64-128.h
+[ 32/209] Compiling install-ns3-header: ns3/object.h
+[ 33/209] Compiling install-ns3-header: ns3/realtime-simulator-impl.h
+[ 34/209] Compiling install-ns3-header: ns3/system-mutex.h
+[ 35/209] Compiling install-ns3-header: ns3/make-event.h
+[ 36/209] Compiling install-ns3-header: ns3/type-id.h
+[ 37/209] Compiling install-ns3-header: ns3/random-variable-stream.h
+[ 38/209] Compiling install-ns3-header: ns3/integer.h
+[ 39/209] Compiling install-ns3-header: ns3/log.h
+[ 40/209] Compiling install-ns3-header: ns3/show-progress.h
+[ 41/209] Compiling install-ns3-header: ns3/node-printer.h
+[ 42/209] Compiling install-ns3-header: ns3/event-garbage-collector.h
+[ 43/209] Compiling install-ns3-header: ns3/boolean.h
+[ 44/209] Compiling install-ns3-header: ns3/heap-scheduler.h
+[ 45/209] Compiling install-ns3-header: ns3/attribute.h
+[ 46/209] Compiling install-ns3-header: ns3/int-to-type.h
+[ 47/209] Compiling install-ns3-header: ns3/simulator-impl.h
+[ 48/209] Compiling install-ns3-header: ns3/rng-seed-manager.h
+[ 49/209] Compiling install-ns3-header: ns3/event-impl.h
+[ 50/209] Compiling install-ns3-header: ns3/rng-stream.h
+[ 51/209] Compiling install-ns3-header: ns3/int64x64.h
+[ 52/209] Compiling install-ns3-header: ns3/trace-source-accessor.h
+[ 53/209] Compiling install-ns3-header: ns3/system-path.h
+[ 54/209] Compiling install-ns3-header: ns3/timer.h
+[ 55/209] Compiling install-ns3-header: ns3/test.h
+[ 56/209] Compiling install-ns3-header: ns3/system-thread.h
+[ 57/209] Compiling install-ns3-header: ns3/type-name.h
+[ 58/209] Compiling install-ns3-header: ns3/simulation-singleton.h
+[ 59/209] Compiling install-ns3-header: ns3/nstime.h
+[ 60/209] Compiling install-ns3-header: ns3/math.h
+[ 61/209] Compiling install-ns3-header: ns3/event-id.h
+[ 62/209] Compiling install-ns3-header: ns3/scheduler.h
+[ 63/209] Compiling install-ns3-header: ns3/valgrind.h
+[ 64/209] Compiling install-ns3-header: ns3/time-printer.h
+[ 65/209] Compiling install-ns3-header: ns3/system-wall-clock-ms.h
+[ 66/209] Compiling install-ns3-header: ns3/system-condition.h
+[ 67/209] Compiling install-ns3-header: ns3/wall-clock-synchronizer.h
+[ 68/209] Compiling install-ns3-header: ns3/enum.h
+[ 69/209] Compiling install-ns3-header: ns3/uinteger.h
+[ 70/209] Compiling install-ns3-header: ns3/double.h
+[ 71/209] Compiling install-ns3-header: ns3/timer-impl.h
+[ 72/209] Compiling install-ns3-header: ns3/ref-count-base.h
+[ 73/209] Compiling install-ns3-header: ns3/random-variable-stream-helper.h
+[ 74/209] Compiling install-ns3-header: ns3/object-vector.h
+[ 75/209] Compiling install-ns3-header: ns3/object-map.h
+[ 76/209] Compiling install-ns3-header: ns3/pointer.h
+[ 77/209] Compiling install-ns3-header: ns3/string.h
+[ 78/209] Compiling install-ns3-header: ns3/unix-fd-reader.h
+[ 79/209] Compiling install-ns3-header: ns3/config.h
+[ 80/209] Compiling install-ns3-header: ns3/list-scheduler.h
+[ 81/209] Compiling install-ns3-header: ns3/object-ptr-container.h
+[ 82/209] Compiling install-ns3-header: ns3/int64x64-double.h
+[ 83/209] Compiling install-ns3-header: ns3/empty.h
+[ 84/209] Compiling install-ns3-header: ns3/abort.h
+[ 85/209] Compiling install-ns3-header: ns3/watchdog.h
+[ 86/209] Compiling install-ns3-header: ns3/simple-ref-count.h
+[ 87/209] Compiling install-ns3-header: ns3/fatal-error.h
+[ 88/209] Compiling install-ns3-header: ns3/hash-fnv.h
+[ 89/209] Compiling install-ns3-header: ns3/object-factory.h
+[ 90/209] Compiling install-ns3-header: ns3/log-macros-enabled.h
+[ 91/209] Compiling install-ns3-header: ns3/callback.h
+[ 92/209] Compiling install-ns3-header: ns3/default-deleter.h
+[ 93/209] Compiling install-ns3-header: ns3/synchronizer.h
+[ 94/209] Compiling install-ns3-header: ns3/fatal-impl.h
+[ 95/209] Compiling install-ns3-header: ns3/attribute-construction-list.h
+[ 96/209] Compiling install-ns3-header: ns3/simulator.h
+[ 97/209] Compiling install-ns3-header: ns3/hash.h
+[ 98/209] Compiling install-ns3-header: ns3/breakpoint.h
+[ 99/209] Compiling install-ns3-header: ns3/vector.h
+[100/209] Compiling install-ns3-header: ns3/log-macros-disabled.h
+[101/209] Compiling install-ns3-header: ns3/ptr.h
+[102/209] Compiling install-ns3-header: ns3/singleton.h
+[103/209] Compiling install-ns3-header: ns3/default-simulator-impl.h
+[104/209] Compiling install-ns3-header: ns3/deprecated.h
+[105/209] Compiling install-ns3-header: ns3/assert.h
+[106/209] Compiling install-ns3-header: ns3/attribute-helper.h
+[107/209] Compiling install-ns3-header: ns3/hash-murmur3.h
+[108/209] Compiling install-ns3-header: ns3/names.h
+[109/209] Compiling install-ns3-header: ns3/map-scheduler.h
+[110/209] Compiling install-ns3-header: ns3/attribute-accessor-helper.h
+[111/209] Compiling install-ns3-header: ns3/des-metrics.h
+[112/209] Compiling install-ns3-header: ns3/calendar-scheduler.h
+[113/209] Compiling install-ns3-header: ns3/global-value.h
+[114/209] Compiling install-ns3-header: ns3/unused.h
+[115/209] Compiling install-ns3-header: ns3/type-traits.h
+[116/209] Compiling src/core/model/test.cc
+[117/209] Processing gen-module-header: ns3/core-module.h
+[118/209] Compiling src/core/model/object.cc
+[119/209] Compiling src/core/model/event-impl.cc
+[120/209] Compiling src/core/model/global-value.cc
+[121/209] Compiling src/core/model/ref-count-base.cc
+[122/209] Compiling src/core/helper/random-variable-stream-helper.cc
+[123/209] Compiling src/core/model/hash.cc
+[124/209] Compiling src/core/model/object-base.cc
+[125/209] Compiling src/core/model/event-id.cc
+[126/209] Compiling src/core/model/attribute-construction-list.cc
+[127/209] Compiling src/core/model/names.cc
+[128/209] Compiling src/core/model/time-printer.cc
+[129/209] Compiling src/core/model/map-scheduler.cc
+[130/209] Processing gen-module-header: ns3/MultiCoreSim-module.h
+[131/209] Compiling src/core/model/callback.cc
+[132/209] Compiling src/core/model/simulator-impl.cc
+[133/209] Compiling src/core/model/object-ptr-container.cc
+[134/209] Compiling src/core/model/type-name.cc
+[135/209] Compiling src/core/model/enum.cc
+[136/209] Compiling src/core/model/int64x64.cc
+[137/209] Compiling src/core/model/integer.cc
+[138/209] Compiling src/core/model/realtime-simulator-impl.cc
+[139/209] Compiling src/core/model/command-line.cc
+[140/209] Compiling src/core/model/config.cc
+[141/209] Compiling src/core/model/string.cc
+[142/209] Compiling src/core/model/object-factory.cc
+[143/209] Compiling src/core/model/attribute.cc
+[144/209] Compiling src/core/model/watchdog.cc
+[145/209] Compiling src/core/model/hash-murmur3.cc
+[146/209] Compiling src/core/model/uinteger.cc
+[147/209] Compiling src/core/model/unix-system-mutex.cc
+[148/209] Compiling src/core/model/trace-source-accessor.cc
+[149/209] Compiling src/core/model/rng-seed-manager.cc
+[150/209] Compiling src/core/model/boolean.cc
+[151/209] Compiling src/core/model/rng-stream.cc
+[152/209] Compiling src/core/model/node-printer.cc
+[153/209] Compiling src/core/model/list-scheduler.cc
+[154/209] Compiling src/core/model/breakpoint.cc
+[155/209] Compiling src/core/model/type-id.cc
+[156/209] Compiling src/core/model/show-progress.cc
+[157/209] Compiling src/core/model/pointer.cc
+[158/209] Compiling src/core/model/unix-system-wall-clock-ms.cc
+[159/209] Compiling src/core/model/hash-function.cc
+[160/209] Compiling src/core/model/des-metrics.cc
+[161/209] Compiling src/core/model/calendar-scheduler.cc
+[162/209] Compiling src/core/model/int64x64-128.cc
+[163/209] Compiling src/core/model/simulator.cc
+Waf: Leaving directory `/home/rmirosan/Dropbox/Papers/RTSS2021/dev-duetto-git/build'
+[01;31mInterrupted[0m 
